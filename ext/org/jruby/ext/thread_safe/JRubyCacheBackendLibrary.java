@@ -63,7 +63,7 @@ public class JRubyCacheBackendLibrary implements Library {
                 return true;
             } catch (Throwable t) { // ensuring we really do catch everything
                 // Doug's Unsafe setup errors always have this "Could not ini.." message
-                if (t.getMessage().contains("Could not initialize intrinsics") || isCausedBySecurityException(t)) {
+                if (isCausedBySecurityException(t)) {
                     return false;
                 }
                 throw (t instanceof RuntimeException ? (RuntimeException) t : new RuntimeException(t));
@@ -72,7 +72,7 @@ public class JRubyCacheBackendLibrary implements Library {
 
         private static boolean isCausedBySecurityException(Throwable t) {
             while (t != null) {
-                if (t instanceof SecurityException) {
+                if ((t.getMessage() != null && t.getMessage().contains("Could not initialize intrinsics")) || t instanceof SecurityException) {
                     return true;
                 }
                 t = t.getCause();
