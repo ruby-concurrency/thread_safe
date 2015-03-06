@@ -7,7 +7,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["headius@headius.com", "thedarkone2@gmail.com"]
   gem.description   = %q{Thread-safe collections and utilities for Ruby}
   gem.summary       = %q{A collection of data structures and utilities to make thread-safe programming in Ruby easier}
-  gem.homepage      = "https://github.com/headius/thread_safe"
+  gem.homepage      = "https://github.com/ruby-concurrency/thread_safe"
 
   gem.files         = `git ls-files`.split($\)
   gem.files        += ['lib/thread_safe/jruby_cache_backend.jar'] if defined?(JRUBY_VERSION)
