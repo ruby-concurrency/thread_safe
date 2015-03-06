@@ -3,6 +3,7 @@
 .rbx/*
 .bundle
 .config
+/.idea
 .yardoc
 Gemfile.lock
 InstalledFiles
