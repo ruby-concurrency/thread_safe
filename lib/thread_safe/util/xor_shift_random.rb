@@ -1,7 +1,9 @@
 module ThreadSafe
   module Util
-    # A xorshift random number (positive +Fixnum+s) generator, provides reasonably cheap way to generate thread local random numbers without contending for
-    # the global +Kernel.rand+.
+    # A xorshift random number (positive +Fixnum+s) generator, provides
+    # reasonably cheap way to generate thread local random numbers without
+    # contending for the global +Kernel.rand+.
+    #
     # Usage:
     #   x = XorShiftRandom.get # uses Kernel.rand to generate an initial seed
     #   while true

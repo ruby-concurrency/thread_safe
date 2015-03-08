@@ -1,7 +1,10 @@
 module ThreadSafe
   module Util
-    # A Ruby port of the Doug Lea's jsr166e.LondAdder class version 1.8 available in public domain.
-    # Original source code available here: http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/LongAdder.java?revision=1.8
+    # A Ruby port of the Doug Lea's jsr166e.LondAdder class version 1.8
+    # available in public domain.
+    #
+    # Original source code available here:
+    # http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/LongAdder.java?revision=1.8
     #
     # One or more variables that together maintain an initially zero
     # sum. When updates (method +add+) are contended across threads,
