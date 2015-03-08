@@ -1,6 +1,19 @@
 require "bundler/gem_tasks"
 require "rake/testtask"
 
+## safely load all the rake tasks in the `tasks` directory
+def safe_load(file)
+  begin
+    load file
+  rescue LoadError => ex
+    puts "Error loading rake tasks from '#{file}' but will continue..."
+    puts ex.message
+  end
+end
+Dir.glob('tasks/**/*.rake').each do |rakefile|
+  safe_load rakefile
+end
+
 task :default => :test
 
 if defined?(JRUBY_VERSION)
