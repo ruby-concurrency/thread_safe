@@ -1,0 +1,501 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: ThreadSafe::Util::Adder
+  
+    &mdash; Concurrent
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../../';
+  framesUrl = "../../frames.html#!ThreadSafe/Util/Adder.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../../_index.html">Index (A)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../ThreadSafe.html" title="ThreadSafe (module)">ThreadSafe</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Util.html" title="ThreadSafe::Util (module)">Util</a></span></span>
+     &raquo; 
+    <span class="title">Adder</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="../../method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="../../file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Class: ThreadSafe::Util::Adder
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName"><span class='object_link'><a href="Striped64.html" title="ThreadSafe::Util::Striped64 (class)">Striped64</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="Striped64.html" title="ThreadSafe::Util::Striped64 (class)">Striped64</a></span></li>
+          
+            <li class="next">ThreadSafe::Util::Adder</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/thread_safe/util/adder.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>A Ruby port of the Doug Lea&#39;s jsr166e.LondAdder class version 1.8
+available in public domain.</p>
+
+<p>Original source code available here:
+<a href="http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/LongAdder.java?revision=1.8">http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/LongAdder.java?revision=1.8</a></p>
+
+<p>One or more variables that together maintain an initially zero
+sum. When updates (method +add+) are contended across threads,
+the set of variables may grow dynamically to reduce contention.
+Method +sum+ returns the current total combined across the
+variables maintaining the sum.</p>
+
+<p>This class is usually preferable to single +Atomic+ reference when
+multiple threads update a common sum that is used for purposes such
+as collecting statistics, not for fine-grained synchronization
+control.  Under low update contention, the two classes have similar
+characteristics. But under high contention, expected throughput of
+this class is significantly higher, at the expense of higher space
+consumption.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+  <h2>Constant Summary</h2>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#add-instance_method" title="#add (instance method)">- (Object) <strong>add</strong>(x) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Adds the given value.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#decrement-instance_method" title="#decrement (instance method)">- (Object) <strong>decrement</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#increment-instance_method" title="#increment (instance method)">- (Object) <strong>increment</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#reset-instance_method" title="#reset (instance method)">- (Object) <strong>reset</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#sum-instance_method" title="#sum (instance method)">- (Object) <strong>sum</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the current sum.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <p class="notice">This class inherits a constructor from <span class='object_link'><a href="Striped64.html#initialize-instance_method" title="ThreadSafe::Util::Striped64#initialize (method)">ThreadSafe::Util::Striped64</a></span></p>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="add-instance_method">
+  
+    - (<tt>Object</tt>) <strong>add</strong>(x) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Adds the given value.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+24
+25
+26
+27
+28
+29
+30
+31
+32</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/util/adder.rb', line 24</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add'>add</span><span class='lparen'>(</span><span class='id identifier rubyid_x'>x</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_current_cells'>current_cells</span> <span class='op'>=</span> <span class='id identifier rubyid_cells'>cells</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='op'>!</span><span class='id identifier rubyid_cas_base_computed'>cas_base_computed</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_current_base'>current_base</span><span class='op'>|</span> <span class='id identifier rubyid_current_base'>current_base</span> <span class='op'>+</span> <span class='id identifier rubyid_x'>x</span><span class='rbrace'>}</span>
+    <span class='id identifier rubyid_was_uncontended'>was_uncontended</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='id identifier rubyid_hash'>hash</span>            <span class='op'>=</span> <span class='id identifier rubyid_hash_code'>hash_code</span>
+    <span class='kw'>unless</span> <span class='id identifier rubyid_current_cells'>current_cells</span> <span class='op'>&amp;&amp;</span> <span class='lparen'>(</span><span class='id identifier rubyid_cell'>cell</span> <span class='op'>=</span> <span class='id identifier rubyid_current_cells'>current_cells</span><span class='period'>.</span><span class='id identifier rubyid_volatile_get_by_hash'>volatile_get_by_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='lparen'>(</span><span class='id identifier rubyid_was_uncontended'>was_uncontended</span> <span class='op'>=</span> <span class='id identifier rubyid_cell'>cell</span><span class='period'>.</span><span class='id identifier rubyid_cas_computed'>cas_computed</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_current_value'>current_value</span><span class='op'>|</span> <span class='id identifier rubyid_current_value'>current_value</span> <span class='op'>+</span> <span class='id identifier rubyid_x'>x</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_retry_update'>retry_update</span><span class='lparen'>(</span><span class='id identifier rubyid_x'>x</span><span class='comma'>,</span> <span class='id identifier rubyid_hash'>hash</span><span class='comma'>,</span> <span class='id identifier rubyid_was_uncontended'>was_uncontended</span><span class='rparen'>)</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_current_value'>current_value</span><span class='op'>|</span> <span class='id identifier rubyid_current_value'>current_value</span> <span class='op'>+</span> <span class='id identifier rubyid_x'>x</span><span class='rbrace'>}</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="decrement-instance_method">
+  
+    - (<tt>Object</tt>) <strong>decrement</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+38
+39
+40</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/util/adder.rb', line 38</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_decrement'>decrement</span>
+  <span class='id identifier rubyid_add'>add</span><span class='lparen'>(</span><span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="increment-instance_method">
+  
+    - (<tt>Object</tt>) <strong>increment</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+34
+35
+36</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/util/adder.rb', line 34</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_increment'>increment</span>
+  <span class='id identifier rubyid_add'>add</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="reset-instance_method">
+  
+    - (<tt>Object</tt>) <strong>reset</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+57
+58
+59</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/util/adder.rb', line 57</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_reset'>reset</span>
+  <span class='id identifier rubyid_internal_reset'>internal_reset</span><span class='lparen'>(</span><span class='int'>0</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="sum-instance_method">
+  
+    - (<tt>Object</tt>) <strong>sum</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the current sum.  The returned value is <em>NOT</em> an
+atomic snapshot: Invocation in the absence of concurrent
+updates returns an accurate result, but concurrent updates that
+occur while the sum is being calculated might not be
+incorporated.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+47
+48
+49
+50
+51
+52
+53
+54
+55</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/util/adder.rb', line 47</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_sum'>sum</span>
+  <span class='id identifier rubyid_x'>x</span> <span class='op'>=</span> <span class='id identifier rubyid_base'>base</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_current_cells'>current_cells</span> <span class='op'>=</span> <span class='id identifier rubyid_cells'>cells</span>
+    <span class='id identifier rubyid_current_cells'>current_cells</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_cell'>cell</span><span class='op'>|</span>
+      <span class='id identifier rubyid_x'>x</span> <span class='op'>+=</span> <span class='id identifier rubyid_cell'>cell</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span> <span class='kw'>if</span> <span class='id identifier rubyid_cell'>cell</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_x'>x</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Sun Mar  8 18:07:43 2015 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.6 (ruby-2.2.0).
+</div>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57940973-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+  </body>
+</html>

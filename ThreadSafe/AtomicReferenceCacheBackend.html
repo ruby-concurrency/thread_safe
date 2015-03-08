@@ -1,0 +1,1787 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: ThreadSafe::AtomicReferenceCacheBackend
+  
+    &mdash; Concurrent
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../';
+  framesUrl = "../frames.html#!ThreadSafe/AtomicReferenceCacheBackend.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (A)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../ThreadSafe.html" title="ThreadSafe (module)">ThreadSafe</a></span></span>
+     &raquo; 
+    <span class="title">AtomicReferenceCacheBackend</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="../method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="../file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Class: ThreadSafe::AtomicReferenceCacheBackend
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">ThreadSafe::AtomicReferenceCacheBackend</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+      <dt class="r2">Extended by:</dt>
+      <dd class="r2"><span class='object_link'><a href="Util/Volatile.html" title="ThreadSafe::Util::Volatile (module)">Util::Volatile</a></span></dd>
+      
+    
+  
+    
+  
+  
+  
+    <dt class="r1 last">Defined in:</dt>
+    <dd class="r1 last">lib/thread_safe/atomic_reference_cache_backend.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>A Ruby port of the Doug Lea&#39;s jsr166e.ConcurrentHashMapV8 class version 1.59
+available in public domain.</p>
+
+<p>Original source code available here:
+<a href="http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/ConcurrentHashMapV8.java?revision=1.59">http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/ConcurrentHashMapV8.java?revision=1.59</a></p>
+
+<p>The Ruby port skips out the +TreeBin+ (red-black trees for use in bins whose
+size exceeds a threshold).</p>
+
+<p>A hash table supporting full concurrency of retrievals and high expected
+concurrency for updates. However, even though all operations are
+thread-safe, retrieval operations do <em>not</em> entail locking, and there is
+<em>not</em> any support for locking the entire table in a way that prevents all
+access.</p>
+
+<p>Retrieval operations generally do not block, so may overlap with update
+operations. Retrievals reflect the results of the most recently <em>completed</em>
+update operations holding upon their onset. (More formally, an update
+operation for a given key bears a <em>happens-before</em> relation with any (non
++nil+) retrieval for that key reporting the updated value.) For aggregate
+operations such as +clear()+, concurrent retrievals may reflect insertion or
+removal of only some entries. Similarly, the +each_pair+ iterator yields
+elements reflecting the state of the hash table at some point at or since
+the start of the +each_pair+. Bear in mind that the results of aggregate
+status methods including +size()+ and +empty?+} are typically useful only
+when a map is not undergoing concurrent updates in other threads. Otherwise
+the results of these methods reflect transient states that may be adequate
+for monitoring or estimation purposes, but not for program control.</p>
+
+<p>The table is dynamically expanded when there are too many collisions (i.e.,
+keys that have distinct hash codes but fall into the same slot modulo the
+table size), with the expected average effect of maintaining roughly two
+bins per mapping (corresponding to a 0.75 load factor threshold for
+resizing). There may be much variance around this average as mappings are
+added and removed, but overall, this maintains a commonly accepted
+time/space tradeoff for hash tables. However, resizing this or any other
+kind of hash table may be a relatively slow operation. When possible, it is
+a good idea to provide a size estimate as an optional :initial_capacity
+initializer argument. An additional optional :load_factor constructor
+argument provides a further means of customizing initial table capacity by
+specifying the table density to be used in calculating the amount of space
+to allocate for the given number of elements. Note that using many keys with
+exactly the same +hash+ is a sure way to slow down performance of any hash
+table.</p>
+
+<p>== Design overview</p>
+
+<p>The primary design goal of this hash table is to maintain concurrent
+readability (typically method +[]+, but also iteration and related methods)
+while minimizing update contention. Secondary goals are to keep space
+consumption about the same or better than plain +Hash+, and to support high
+initial insertion rates on an empty table by many threads.</p>
+
+<p>Each key-value mapping is held in a +Node+. The validation-based approach
+explained below leads to a lot of code sprawl because retry-control
+precludes factoring into smaller methods.</p>
+
+<p>The table is lazily initialized to a power-of-two size upon the first
+insertion. Each bin in the table normally contains a list of +Node+s (most
+often, the list has only zero or one +Node+). Table accesses require
+volatile/atomic reads, writes, and CASes. The lists of nodes within bins are
+always accurately traversable under volatile reads, so long as lookups check
+hash code and non-nullness of value before checking key equality.</p>
+
+<p>We use the top two bits of +Node+ hash fields for control purposes -- they
+are available anyway because of addressing constraints. As explained further
+below, these top bits are used as follows:</p>
+
+<ul>
+<li>00 - Normal</li>
+<li>01 - Locked</li>
+<li>11 - Locked and may have a thread waiting for lock</li>
+<li>10 - +Node+ is a forwarding node</li>
+</ul>
+
+<p>The lower 28 bits of each +Node+&#39;s hash field contain a the key&#39;s hash code,
+except for forwarding nodes, for which the lower bits are zero (and so
+always have hash field == +MOVED+).</p>
+
+<p>Insertion (via +[]=+ or its variants) of the first node in an empty bin is
+performed by just CASing it to the bin. This is by far the most common case
+for put operations under most key/hash distributions. Other update
+operations (insert, delete, and replace) require locks. We do not want to
+waste the space required to associate a distinct lock object with each bin,
+so instead use the first node of a bin list itself as a lock. Blocking
+support for these locks relies +Util::CheapLockable. However, we also need a
++try_lock+ construction, so we overlay these by using bits of the +Node+
+hash field for lock control (see above), and so normally use builtin
+monitors only for blocking and signalling using
++cheap_wait+/+cheap_broadcast+ constructions. See +Node#try_await_lock+.</p>
+
+<p>Using the first node of a list as a lock does not by itself suffice though:
+When a node is locked, any update must first validate that it is still the
+first node after locking it, and retry if not. Because new nodes are always
+appended to lists, once a node is first in a bin, it remains first until
+deleted or the bin becomes invalidated (upon resizing). However, operations
+that only conditionally update may inspect nodes until the point of update.
+This is a converse of sorts to the lazy locking technique described by
+Herlihy &amp; Shavit.</p>
+
+<p>The main disadvantage of per-bin locks is that other update operations on
+other nodes in a bin list protected by the same lock can stall, for example
+when user +eql?+ or mapping functions take a long time. However,
+statistically, under random hash codes, this is not a common problem.
+Ideally, the frequency of nodes in bins follows a Poisson distribution
+(<a href="http://en.wikipedia.org/wiki/Poisson_distribution">http://en.wikipedia.org/wiki/Poisson_distribution</a>) with a parameter of
+about 0.5 on average, given the resizing threshold of 0.75, although with a
+large variance because of resizing granularity. Ignoring variance, the
+expected occurrences of list size k are (exp(-0.5) * pow(0.5, k) /
+factorial(k)). The first values are:</p>
+
+<ul>
+<li>0:    0.60653066</li>
+<li>1:    0.30326533</li>
+<li>2:    0.07581633</li>
+<li>3:    0.01263606</li>
+<li>4:    0.00157952</li>
+<li>5:    0.00015795</li>
+<li>6:    0.00001316</li>
+<li>7:    0.00000094</li>
+<li>8:    0.00000006</li>
+<li>more: less than 1 in ten million</li>
+</ul>
+
+<p>Lock contention probability for two threads accessing distinct elements is
+roughly 1 / (8 * #elements) under random hashes.</p>
+
+<p>The table is resized when occupancy exceeds a percentage threshold
+(nominally, 0.75, but see below). Only a single thread performs the resize
+(using field +size_control+, to arrange exclusion), but the table otherwise
+remains usable for reads and updates. Resizing proceeds by transferring
+bins, one by one, from the table to the next table. Because we are using
+power-of-two expansion, the elements from each bin must either stay at same
+index, or move with a power of two offset. We eliminate unnecessary node
+creation by catching cases where old nodes can be reused because their next
+fields won&#39;t change. On average, only about one-sixth of them need cloning
+when a table doubles. The nodes they replace will be garbage collectable as
+soon as they are no longer referenced by any reader thread that may be in
+the midst of concurrently traversing table. Upon transfer, the old table bin
+contains only a special forwarding node (with hash field +MOVED+) that
+contains the next table as its key. On encountering a forwarding node,
+access and update operations restart, using the new table.</p>
+
+<p>Each bin transfer requires its bin lock. However, unlike other cases, a
+transfer can skip a bin if it fails to acquire its lock, and revisit it
+later. Method +rebuild+ maintains a buffer of TRANSFER_BUFFER_SIZE bins that
+have been skipped because of failure to acquire a lock, and blocks only if
+none are available (i.e., only very rarely). The transfer operation must
+also ensure that all accessible bins in both the old and new table are
+usable by any traversal. When there are no lock acquisition failures, this
+is arranged simply by proceeding from the last bin (+table.size - 1+) up
+towards the first. Upon seeing a forwarding node, traversals arrange to move
+to the new table without revisiting nodes. However, when any node is skipped
+during a transfer, all earlier table bins may have become visible, so are
+initialized with a reverse-forwarding node back to the old table until the
+new ones are established. (This sometimes requires transiently locking a
+forwarding node, which is possible under the above encoding.) These more
+expensive mechanics trigger only when necessary.</p>
+
+<p>The traversal scheme also applies to partial traversals of
+ranges of bins (via an alternate Traverser constructor)
+to support partitioned aggregate operations.  Also, read-only
+operations give up if ever forwarded to a null table, which
+provides support for shutdown-style clearing, which is also not
+currently implemented.</p>
+
+<p>Lazy table initialization minimizes footprint until first use.</p>
+
+<p>The element count is maintained using a +ThreadSafe::Util::Adder+,
+which avoids contention on updates but can encounter cache thrashing
+if read too frequently during concurrent access. To avoid reading so
+often, resizing is attempted either when a bin lock is
+contended, or upon adding to a bin already holding two or more
+nodes (checked before adding in the +x_if_absent+ methods, after
+adding in others). Under uniform hash distributions, the
+probability of this occurring at threshold is around 13%,
+meaning that only about 1 in 8 puts check threshold (and after
+resizing, many fewer do so). But this approximation has high
+variance for small table sizes, so we check on any collision
+for sizes &lt;= 64. The bulk putAll operation further reduces
+contention by only committing count updates upon these size
+checks.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="AtomicReferenceCacheBackend/Node.html" title="ThreadSafe::AtomicReferenceCacheBackend::Node (class)">Node</a></span>, <span class='object_link'><a href="AtomicReferenceCacheBackend/Table.html" title="ThreadSafe::AtomicReferenceCacheBackend::Table (class)">Table</a></span>
+    
+  
+</p>
+
+  <h2>Constant Summary</h2>
+  
+    <dl class="constants">
+      
+        <dt id="MOVED-constant" class="">MOVED =
+          <div class="docstring">
+  <div class="discussion">
+    <p>shorthands</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='const'>Node</span><span class='op'>::</span><span class='const'>MOVED</span></pre></dd>
+      
+        <dt id="LOCKED-constant" class="">LOCKED =
+          
+        </dt>
+        <dd><pre class="code"><span class='const'>Node</span><span class='op'>::</span><span class='const'>LOCKED</span></pre></dd>
+      
+        <dt id="WAITING-constant" class="">WAITING =
+          
+        </dt>
+        <dd><pre class="code"><span class='const'>Node</span><span class='op'>::</span><span class='const'>WAITING</span></pre></dd>
+      
+        <dt id="HASH_BITS-constant" class="">HASH_BITS =
+          
+        </dt>
+        <dd><pre class="code"><span class='const'>Node</span><span class='op'>::</span><span class='const'>HASH_BITS</span></pre></dd>
+      
+        <dt id="NOW_RESIZING-constant" class="">NOW_RESIZING =
+          
+        </dt>
+        <dd><pre class="code"><span class='op'>-</span><span class='int'>1</span></pre></dd>
+      
+        <dt id="DEFAULT_CAPACITY-constant" class="">DEFAULT_CAPACITY =
+          
+        </dt>
+        <dd><pre class="code"><span class='int'>16</span></pre></dd>
+      
+        <dt id="MAX_CAPACITY-constant" class="">MAX_CAPACITY =
+          
+        </dt>
+        <dd><pre class="code"><span class='const'>Util</span><span class='op'>::</span><span class='const'>MAX_INT</span></pre></dd>
+      
+        <dt id="TRANSFER_BUFFER_SIZE-constant" class="">TRANSFER_BUFFER_SIZE =
+          <div class="docstring">
+  <div class="discussion">
+    <p>The buffer size for skipped bins during transfers. The
+value is arbitrary but should be large enough to avoid
+most locking stalls during resizes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='int'>32</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#attr_volatile-class_method" title="#attr_volatile (class method)">+ (Object) <strong>attr_volatile</strong>(*attr_names) </a>
+    
+
+    
+  </span>
+  
+    <span class="note title not_defined_here">
+      extended
+      from <span class='object_link'><a href="Util/Volatile.html#attr_volatile-class_method" title="ThreadSafe::Util::Volatile#attr_volatile (method)">Util::Volatile</a></span>
+    </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Provides +volatile+ (in the JVM&#39;s sense) attribute accessors implemented atop of the +AtomicReference+s.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#%5B%5D-instance_method" title="#[] (instance method)">- (Object) <strong>[]</strong>(key) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#%5B%5D%3D-instance_method" title="#[]= (instance method)">- (Object) <strong>[]=</strong>(key, value) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#clear-instance_method" title="#clear (instance method)">- (Object) <strong>clear</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Implementation for clear.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#compute-instance_method" title="#compute (instance method)">- (Object) <strong>compute</strong>(key) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#compute_if_absent-instance_method" title="#compute_if_absent (instance method)">- (Object) <strong>compute_if_absent</strong>(key) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#compute_if_present-instance_method" title="#compute_if_present (instance method)">- (Object) <strong>compute_if_present</strong>(key) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#delete-instance_method" title="#delete (instance method)">- (Object) <strong>delete</strong>(key) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#delete_pair-instance_method" title="#delete_pair (instance method)">- (Object) <strong>delete_pair</strong>(key, value) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#each_pair-instance_method" title="#each_pair (instance method)">- (Object) <strong>each_pair</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#empty%3F-instance_method" title="#empty? (instance method)">- (Boolean) <strong>empty?</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_and_set-instance_method" title="#get_and_set (instance method)">- (Object) <strong>get_and_set</strong>(key, value) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>internalPut in the original CHMV8.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_or_default-instance_method" title="#get_or_default (instance method)">- (Object) <strong>get_or_default</strong>(key, else_value = nil) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (AtomicReferenceCacheBackend) <strong>initialize</strong>(options = nil) </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A new instance of AtomicReferenceCacheBackend.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#key%3F-instance_method" title="#key? (instance method)">- (Boolean) <strong>key?</strong>(key) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_pair-instance_method" title="#merge_pair (instance method)">- (Object) <strong>merge_pair</strong>(key, value) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#replace_if_exists-instance_method" title="#replace_if_exists (instance method)">- (Object) <strong>replace_if_exists</strong>(key, new_value) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#replace_pair-instance_method" title="#replace_pair (instance method)">- (Object) <strong>replace_pair</strong>(key, old_value, new_value) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#size-instance_method" title="#size (instance method)">- (Object) <strong>size</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    - (<tt><span class='object_link'><a href="" title="ThreadSafe::AtomicReferenceCacheBackend (class)">AtomicReferenceCacheBackend</a></span></tt>) <strong>initialize</strong>(options = nil) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns a new instance of AtomicReferenceCacheBackend</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+357
+358
+359
+360
+361
+362</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 357</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='rparen'>)</span>
+  <span class='ivar'>@counter</span> <span class='op'>=</span> <span class='const'>Util</span><span class='op'>::</span><span class='const'>Adder</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+  <span class='id identifier rubyid_initial_capacity'>initial_capacity</span>  <span class='op'>=</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:initial_capacity</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='const'>DEFAULT_CAPACITY</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_size_control'>size_control</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_capacity'>capacity</span> <span class='op'>=</span> <span class='id identifier rubyid_table_size_for'>table_size_for</span><span class='lparen'>(</span><span class='id identifier rubyid_initial_capacity'>initial_capacity</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='op'>&gt;</span> <span class='const'>MAX_CAPACITY</span> <span class='op'>?</span> <span class='const'>MAX_CAPACITY</span> <span class='op'>:</span> <span class='id identifier rubyid_capacity'>capacity</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="attr_volatile-class_method">
+  
+    + (<tt>Object</tt>) <strong>attr_volatile</strong>(*attr_names) 
+  
+
+  
+
+  
+    <span class="not_defined_here">
+      Originally defined in module
+        <span class='object_link'><a href="Util/Volatile.html#attr_volatile-class_method" title="ThreadSafe::Util::Volatile#attr_volatile (method)">Util::Volatile</a></span>
+    </span>
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Provides +volatile+ (in the JVM&#39;s sense) attribute accessors implemented atop of the +AtomicReference+s.
+Usage:
+  class Foo
+    extend ThreadSafe::Util::Volatile
+    attr_volatile :foo, :bar</p>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_bar'>bar</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='rparen'>)</span> <span class='comment'># must super() into parent initializers before using the volatile attribute accessors
+</span>  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_bar'>bar</span> <span class='op'>=</span> <span class='id identifier rubyid_bar'>bar</span>
+<span class='kw'>end</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_hello'>hello</span>
+  <span class='id identifier rubyid_my_foo'>my_foo</span> <span class='op'>=</span> <span class='id identifier rubyid_foo'>foo</span> <span class='comment'># volatile read
+</span>  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_foo'>foo</span> <span class='op'>=</span> <span class='int'>1</span> <span class='comment'># volatile write
+</span>  <span class='id identifier rubyid_cas_foo'>cas_foo</span><span class='lparen'>(</span><span class='int'>1</span><span class='comma'>,</span> <span class='int'>2</span><span class='rparen'>)</span> <span class='comment'># =&gt; true | a strong CAS
+</span><span class='kw'>end</span>
+</code></pre>
+
+<p>end</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="[]-instance_method">
+  
+    - (<tt>Object</tt>) <strong>[]</strong>(key) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+382
+383
+384</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 382</span>
+
+<span class='kw'>def</span> <span class='op'>[]</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_get_or_default'>get_or_default</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="[]=-instance_method">
+  
+    - (<tt>Object</tt>) <strong>[]=</strong>(key, value) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+390
+391
+392
+393</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 390</span>
+
+<span class='kw'>def</span> <span class='op'>[]=</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_get_and_set'>get_and_set</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_value'>value</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="clear-instance_method">
+  
+    - (<tt>Object</tt>) <strong>clear</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Implementation for clear. Steps through each bin, removing all nodes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+529
+530
+531
+532
+533
+534
+535
+536
+537
+538
+539
+540
+541
+542
+543
+544
+545
+546
+547
+548
+549
+550
+551
+552
+553
+554
+555
+556</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 529</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_clear'>clear</span>
+  <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>unless</span> <span class='id identifier rubyid_current_table'>current_table</span> <span class='op'>=</span> <span class='id identifier rubyid_table'>table</span>
+  <span class='id identifier rubyid_current_table_size'>current_table_size</span> <span class='op'>=</span> <span class='id identifier rubyid_current_table'>current_table</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+  <span class='id identifier rubyid_deleted_count'>deleted_count</span> <span class='op'>=</span> <span class='id identifier rubyid_i'>i</span> <span class='op'>=</span> <span class='int'>0</span>
+  <span class='kw'>while</span> <span class='id identifier rubyid_i'>i</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_current_table_size'>current_table_size</span>
+    <span class='kw'>if</span> <span class='op'>!</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span> <span class='op'>=</span> <span class='id identifier rubyid_current_table'>current_table</span><span class='period'>.</span><span class='id identifier rubyid_volatile_get'>volatile_get</span><span class='lparen'>(</span><span class='id identifier rubyid_i'>i</span><span class='rparen'>)</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_i'>i</span> <span class='op'>+=</span> <span class='int'>1</span>
+    <span class='kw'>elsif</span> <span class='lparen'>(</span><span class='id identifier rubyid_node_hash'>node_hash</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='const'>MOVED</span>
+      <span class='id identifier rubyid_current_table'>current_table</span>      <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span>
+      <span class='id identifier rubyid_current_table_size'>current_table_size</span> <span class='op'>=</span> <span class='id identifier rubyid_current_table'>current_table</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+    <span class='kw'>elsif</span> <span class='const'>Node</span><span class='period'>.</span><span class='id identifier rubyid_locked_hash?'>locked_hash?</span><span class='lparen'>(</span><span class='id identifier rubyid_node_hash'>node_hash</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_decrement_size'>decrement_size</span><span class='lparen'>(</span><span class='id identifier rubyid_deleted_count'>deleted_count</span><span class='rparen'>)</span> <span class='comment'># opportunistically update count
+</span>      <span class='id identifier rubyid_deleted_count'>deleted_count</span> <span class='op'>=</span> <span class='int'>0</span>
+      <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_try_await_lock'>try_await_lock</span><span class='lparen'>(</span><span class='id identifier rubyid_current_table'>current_table</span><span class='comma'>,</span> <span class='id identifier rubyid_i'>i</span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_current_table'>current_table</span><span class='period'>.</span><span class='id identifier rubyid_try_lock_via_hash'>try_lock_via_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_i'>i</span><span class='comma'>,</span> <span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_node_hash'>node_hash</span><span class='rparen'>)</span> <span class='kw'>do</span>
+        <span class='kw'>begin</span>
+          <span class='id identifier rubyid_deleted_count'>deleted_count</span> <span class='op'>+=</span> <span class='int'>1</span> <span class='kw'>if</span> <span class='const'>NULL</span> <span class='op'>!=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span> <span class='comment'># recheck under lock
+</span>          <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='kw'>nil</span>
+        <span class='kw'>end</span> <span class='kw'>while</span> <span class='id identifier rubyid_node'>node</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_next'>next</span>
+        <span class='id identifier rubyid_current_table'>current_table</span><span class='period'>.</span><span class='id identifier rubyid_volatile_set'>volatile_set</span><span class='lparen'>(</span><span class='id identifier rubyid_i'>i</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_i'>i</span> <span class='op'>+=</span> <span class='int'>1</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_decrement_size'>decrement_size</span><span class='lparen'>(</span><span class='id identifier rubyid_deleted_count'>deleted_count</span><span class='rparen'>)</span>
+  <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="compute-instance_method">
+  
+    - (<tt>Object</tt>) <strong>compute</strong>(key) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+430
+431
+432
+433
+434
+435
+436
+437
+438</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 430</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_compute'>compute</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_internal_compute'>internal_compute</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_old_value'>old_value</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_new_value'>new_value</span> <span class='op'>=</span> <span class='kw'>yield</span><span class='lparen'>(</span><span class='const'>NULL</span> <span class='op'>==</span> <span class='id identifier rubyid_old_value'>old_value</span> <span class='op'>?</span> <span class='kw'>nil</span> <span class='op'>:</span> <span class='id identifier rubyid_old_value'>old_value</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+      <span class='const'>NULL</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_new_value'>new_value</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="compute_if_absent-instance_method">
+  
+    - (<tt>Object</tt>) <strong>compute_if_absent</strong>(key) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 395</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_compute_if_absent'>compute_if_absent</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_hash'>hash</span>          <span class='op'>=</span> <span class='id identifier rubyid_key_hash'>key_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_current_table'>current_table</span> <span class='op'>=</span> <span class='id identifier rubyid_table'>table</span> <span class='op'>||</span> <span class='id identifier rubyid_initialize_table'>initialize_table</span>
+  <span class='kw'>while</span> <span class='kw'>true</span>
+    <span class='kw'>if</span> <span class='op'>!</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span> <span class='op'>=</span> <span class='id identifier rubyid_current_table'>current_table</span><span class='period'>.</span><span class='id identifier rubyid_volatile_get'>volatile_get</span><span class='lparen'>(</span><span class='id identifier rubyid_i'>i</span> <span class='op'>=</span> <span class='id identifier rubyid_current_table'>current_table</span><span class='period'>.</span><span class='id identifier rubyid_hash_to_index'>hash_to_index</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_succeeded'>succeeded</span><span class='comma'>,</span> <span class='id identifier rubyid_new_value'>new_value</span> <span class='op'>=</span> <span class='id identifier rubyid_current_table'>current_table</span><span class='period'>.</span><span class='id identifier rubyid_try_to_cas_in_computed'>try_to_cas_in_computed</span><span class='lparen'>(</span><span class='id identifier rubyid_i'>i</span><span class='comma'>,</span> <span class='id identifier rubyid_hash'>hash</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='kw'>yield</span> <span class='rbrace'>}</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_succeeded'>succeeded</span>
+        <span class='id identifier rubyid_increment_size'>increment_size</span>
+        <span class='kw'>return</span> <span class='id identifier rubyid_new_value'>new_value</span>
+      <span class='kw'>end</span>
+    <span class='kw'>elsif</span> <span class='lparen'>(</span><span class='id identifier rubyid_node_hash'>node_hash</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='const'>MOVED</span>
+      <span class='id identifier rubyid_current_table'>current_table</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span>
+    <span class='kw'>elsif</span> <span class='const'>NULL</span> <span class='op'>!=</span> <span class='lparen'>(</span><span class='id identifier rubyid_current_value'>current_value</span> <span class='op'>=</span> <span class='id identifier rubyid_find_value_in_node_list'>find_value_in_node_list</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_hash'>hash</span><span class='comma'>,</span> <span class='id identifier rubyid_node_hash'>node_hash</span> <span class='op'>&amp;</span> <span class='const'>HASH_BITS</span><span class='rparen'>)</span><span class='rparen'>)</span>
+      <span class='kw'>return</span> <span class='id identifier rubyid_current_value'>current_value</span>
+    <span class='kw'>elsif</span> <span class='const'>Node</span><span class='period'>.</span><span class='id identifier rubyid_locked_hash?'>locked_hash?</span><span class='lparen'>(</span><span class='id identifier rubyid_node_hash'>node_hash</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_try_await_lock'>try_await_lock</span><span class='lparen'>(</span><span class='id identifier rubyid_current_table'>current_table</span><span class='comma'>,</span> <span class='id identifier rubyid_i'>i</span><span class='comma'>,</span> <span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_succeeded'>succeeded</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_attempt_internal_compute_if_absent'>attempt_internal_compute_if_absent</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_hash'>hash</span><span class='comma'>,</span> <span class='id identifier rubyid_current_table'>current_table</span><span class='comma'>,</span> <span class='id identifier rubyid_i'>i</span><span class='comma'>,</span> <span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_node_hash'>node_hash</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='kw'>yield</span> <span class='rbrace'>}</span>
+      <span class='kw'>return</span> <span class='id identifier rubyid_value'>value</span> <span class='kw'>if</span> <span class='id identifier rubyid_succeeded'>succeeded</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="compute_if_present-instance_method">
+  
+    - (<tt>Object</tt>) <strong>compute_if_present</strong>(key) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 418</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_compute_if_present'>compute_if_present</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_new_value'>new_value</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_internal_replace'>internal_replace</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_old_value'>old_value</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_new_value'>new_value</span> <span class='op'>=</span> <span class='kw'>yield</span><span class='lparen'>(</span><span class='const'>NULL</span> <span class='op'>==</span> <span class='id identifier rubyid_old_value'>old_value</span> <span class='op'>?</span> <span class='kw'>nil</span> <span class='op'>:</span> <span class='id identifier rubyid_old_value'>old_value</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+      <span class='const'>NULL</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_new_value'>new_value</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_new_value'>new_value</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="delete-instance_method">
+  
+    - (<tt>Object</tt>) <strong>delete</strong>(key) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+480
+481
+482</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 480</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_replace_if_exists'>replace_if_exists</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='const'>NULL</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="delete_pair-instance_method">
+  
+    - (<tt>Object</tt>) <strong>delete_pair</strong>(key, value) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+484
+485
+486
+487
+488
+489
+490
+491</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 484</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_delete_pair'>delete_pair</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_internal_replace'>internal_replace</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='const'>NULL</span> <span class='rbrace'>}</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span> <span class='op'>&amp;&amp;</span> <span class='const'>NULL</span> <span class='op'>!=</span> <span class='id identifier rubyid_result'>result</span>
+    <span class='op'>!</span><span class='op'>!</span><span class='id identifier rubyid_result'>result</span>
+  <span class='kw'>else</span>
+    <span class='kw'>false</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="each_pair-instance_method">
+  
+    - (<tt>Object</tt>) <strong>each_pair</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511
+512
+513
+514
+515
+516
+517
+518</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 493</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_each_pair'>each_pair</span>
+  <span class='kw'>return</span> <span class='kw'>self</span> <span class='kw'>unless</span> <span class='id identifier rubyid_current_table'>current_table</span> <span class='op'>=</span> <span class='id identifier rubyid_table'>table</span>
+  <span class='id identifier rubyid_current_table_size'>current_table_size</span> <span class='op'>=</span> <span class='id identifier rubyid_base_size'>base_size</span> <span class='op'>=</span> <span class='id identifier rubyid_current_table'>current_table</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+  <span class='id identifier rubyid_i'>i</span> <span class='op'>=</span> <span class='id identifier rubyid_base_index'>base_index</span> <span class='op'>=</span> <span class='int'>0</span>
+  <span class='kw'>while</span> <span class='id identifier rubyid_base_index'>base_index</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_base_size'>base_size</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span> <span class='op'>=</span> <span class='id identifier rubyid_current_table'>current_table</span><span class='period'>.</span><span class='id identifier rubyid_volatile_get'>volatile_get</span><span class='lparen'>(</span><span class='id identifier rubyid_i'>i</span><span class='rparen'>)</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_hash'>hash</span> <span class='op'>==</span> <span class='const'>MOVED</span>
+        <span class='id identifier rubyid_current_table'>current_table</span>      <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span>
+        <span class='id identifier rubyid_current_table_size'>current_table_size</span> <span class='op'>=</span> <span class='id identifier rubyid_current_table'>current_table</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+      <span class='kw'>else</span>
+        <span class='kw'>begin</span>
+          <span class='kw'>if</span> <span class='const'>NULL</span> <span class='op'>!=</span> <span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span> <span class='comment'># skip deleted or special nodes
+</span>            <span class='kw'>yield</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span>
+          <span class='kw'>end</span>
+        <span class='kw'>end</span> <span class='kw'>while</span> <span class='id identifier rubyid_node'>node</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_next'>next</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_i_with_base'>i_with_base</span> <span class='op'>=</span> <span class='id identifier rubyid_i'>i</span> <span class='op'>+</span> <span class='id identifier rubyid_base_size'>base_size</span><span class='rparen'>)</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_current_table_size'>current_table_size</span>
+      <span class='id identifier rubyid_i'>i</span> <span class='op'>=</span> <span class='id identifier rubyid_i_with_base'>i_with_base</span> <span class='comment'># visit upper slots if present
+</span>    <span class='kw'>else</span>
+      <span class='id identifier rubyid_i'>i</span> <span class='op'>=</span> <span class='id identifier rubyid_base_index'>base_index</span> <span class='op'>+=</span> <span class='int'>1</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="empty?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>empty?</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+524
+525
+526</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 524</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='id identifier rubyid_size'>size</span> <span class='op'>==</span> <span class='int'>0</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_and_set-instance_method">
+  
+    - (<tt>Object</tt>) <strong>get_and_set</strong>(key, value) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>internalPut in the original CHMV8</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 460</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_and_set'>get_and_set</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span> <span class='comment'># internalPut in the original CHMV8
+</span>  <span class='id identifier rubyid_hash'>hash</span>          <span class='op'>=</span> <span class='id identifier rubyid_key_hash'>key_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_current_table'>current_table</span> <span class='op'>=</span> <span class='id identifier rubyid_table'>table</span> <span class='op'>||</span> <span class='id identifier rubyid_initialize_table'>initialize_table</span>
+  <span class='kw'>while</span> <span class='kw'>true</span>
+    <span class='kw'>if</span> <span class='op'>!</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span> <span class='op'>=</span> <span class='id identifier rubyid_current_table'>current_table</span><span class='period'>.</span><span class='id identifier rubyid_volatile_get'>volatile_get</span><span class='lparen'>(</span><span class='id identifier rubyid_i'>i</span> <span class='op'>=</span> <span class='id identifier rubyid_current_table'>current_table</span><span class='period'>.</span><span class='id identifier rubyid_hash_to_index'>hash_to_index</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='rparen'>)</span>
+      <span class='kw'>if</span> <span class='id identifier rubyid_current_table'>current_table</span><span class='period'>.</span><span class='id identifier rubyid_cas_new_node'>cas_new_node</span><span class='lparen'>(</span><span class='id identifier rubyid_i'>i</span><span class='comma'>,</span> <span class='id identifier rubyid_hash'>hash</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_increment_size'>increment_size</span>
+        <span class='kw'>break</span>
+      <span class='kw'>end</span>
+    <span class='kw'>elsif</span> <span class='lparen'>(</span><span class='id identifier rubyid_node_hash'>node_hash</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='const'>MOVED</span>
+      <span class='id identifier rubyid_current_table'>current_table</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span>
+    <span class='kw'>elsif</span> <span class='const'>Node</span><span class='period'>.</span><span class='id identifier rubyid_locked_hash?'>locked_hash?</span><span class='lparen'>(</span><span class='id identifier rubyid_node_hash'>node_hash</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_try_await_lock'>try_await_lock</span><span class='lparen'>(</span><span class='id identifier rubyid_current_table'>current_table</span><span class='comma'>,</span> <span class='id identifier rubyid_i'>i</span><span class='comma'>,</span> <span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_succeeded'>succeeded</span><span class='comma'>,</span> <span class='id identifier rubyid_old_value'>old_value</span> <span class='op'>=</span> <span class='id identifier rubyid_attempt_get_and_set'>attempt_get_and_set</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_hash'>hash</span><span class='comma'>,</span> <span class='id identifier rubyid_current_table'>current_table</span><span class='comma'>,</span> <span class='id identifier rubyid_i'>i</span><span class='comma'>,</span> <span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_node_hash'>node_hash</span><span class='rparen'>)</span>
+      <span class='kw'>break</span> <span class='id identifier rubyid_old_value'>old_value</span> <span class='kw'>if</span> <span class='id identifier rubyid_succeeded'>succeeded</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_or_default-instance_method">
+  
+    - (<tt>Object</tt>) <strong>get_or_default</strong>(key, else_value = nil) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 364</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_or_default'>get_or_default</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_else_value'>else_value</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_hash'>hash</span>          <span class='op'>=</span> <span class='id identifier rubyid_key_hash'>key_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_current_table'>current_table</span> <span class='op'>=</span> <span class='id identifier rubyid_table'>table</span>
+  <span class='kw'>while</span> <span class='id identifier rubyid_current_table'>current_table</span>
+    <span class='id identifier rubyid_node'>node</span> <span class='op'>=</span> <span class='id identifier rubyid_current_table'>current_table</span><span class='period'>.</span><span class='id identifier rubyid_volatile_get_by_hash'>volatile_get_by_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_current_table'>current_table</span> <span class='op'>=</span>
+      <span class='kw'>while</span> <span class='id identifier rubyid_node'>node</span>
+        <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_node_hash'>node_hash</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='const'>MOVED</span>
+          <span class='kw'>break</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span>
+        <span class='kw'>elsif</span> <span class='lparen'>(</span><span class='id identifier rubyid_node_hash'>node_hash</span> <span class='op'>&amp;</span> <span class='const'>HASH_BITS</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='id identifier rubyid_hash'>hash</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='const'>NULL</span> <span class='op'>!=</span> <span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+          <span class='kw'>return</span> <span class='id identifier rubyid_value'>value</span>
+        <span class='kw'>end</span>
+        <span class='id identifier rubyid_node'>node</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_next'>next</span>
+      <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_else_value'>else_value</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="key?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>key?</strong>(key) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+386
+387
+388</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 386</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_get_or_default'>get_or_default</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='const'>NULL</span><span class='rparen'>)</span> <span class='op'>!=</span> <span class='const'>NULL</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_pair-instance_method">
+  
+    - (<tt>Object</tt>) <strong>merge_pair</strong>(key, value) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+440
+441
+442
+443
+444
+445
+446
+447
+448</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 440</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_pair'>merge_pair</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_internal_compute'>internal_compute</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_old_value'>old_value</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='const'>NULL</span> <span class='op'>==</span> <span class='id identifier rubyid_old_value'>old_value</span> <span class='op'>||</span> <span class='op'>!</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='kw'>yield</span><span class='lparen'>(</span><span class='id identifier rubyid_old_value'>old_value</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+      <span class='id identifier rubyid_value'>value</span>
+    <span class='kw'>else</span>
+      <span class='const'>NULL</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="replace_if_exists-instance_method">
+  
+    - (<tt>Object</tt>) <strong>replace_if_exists</strong>(key, new_value) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+454
+455
+456
+457
+458</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 454</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_replace_if_exists'>replace_if_exists</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_new_value'>new_value</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_internal_replace'>internal_replace</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_new_value'>new_value</span> <span class='rbrace'>}</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='const'>NULL</span> <span class='op'>!=</span> <span class='id identifier rubyid_result'>result</span>
+    <span class='id identifier rubyid_result'>result</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="replace_pair-instance_method">
+  
+    - (<tt>Object</tt>) <strong>replace_pair</strong>(key, old_value, new_value) 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+450
+451
+452</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 450</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_replace_pair'>replace_pair</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_old_value'>old_value</span><span class='comma'>,</span> <span class='id identifier rubyid_new_value'>new_value</span><span class='rparen'>)</span>
+  <span class='const'>NULL</span> <span class='op'>!=</span> <span class='id identifier rubyid_internal_replace'>internal_replace</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_old_value'>old_value</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_new_value'>new_value</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="size-instance_method">
+  
+    - (<tt>Object</tt>) <strong>size</strong> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+520
+521
+522</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/thread_safe/atomic_reference_cache_backend.rb', line 520</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_size'>size</span>
+  <span class='lparen'>(</span><span class='id identifier rubyid_sum'>sum</span> <span class='op'>=</span> <span class='ivar'>@counter</span><span class='period'>.</span><span class='id identifier rubyid_sum'>sum</span><span class='rparen'>)</span> <span class='op'>&lt;</span> <span class='int'>0</span> <span class='op'>?</span> <span class='int'>0</span> <span class='op'>:</span> <span class='id identifier rubyid_sum'>sum</span> <span class='comment'># ignore transient negative values
+</span><span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Sun Mar  8 18:07:43 2015 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.6 (ruby-2.2.0).
+</div>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-57940973-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+  </body>
+</html>
