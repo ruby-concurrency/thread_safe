@@ -1,169 +1,158 @@
 module ThreadSafe
-  # A Ruby port of the Doug Lea's jsr166e.ConcurrentHashMapV8 class version 1.59 available in public domain.
-  # Original source code available here: http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/ConcurrentHashMapV8.java?revision=1.59
+  # A Ruby port of the Doug Lea's jsr166e.ConcurrentHashMapV8 class version 1.59
+  # available in public domain.
   #
-  # The Ruby port skips out the +TreeBin+ (red-black trees for use in bins
-  # whose size exceeds a threshold).
+  # Original source code available here:
+  # http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/ConcurrentHashMapV8.java?revision=1.59
   #
-  # A hash table supporting full concurrency of retrievals and
-  # high expected concurrency for updates. However, even though all
-  # operations are thread-safe, retrieval operations do _not_ entail locking,
-  # and there is _not_ any support for locking the entire table
-  # in a way that prevents all access.
+  # The Ruby port skips out the +TreeBin+ (red-black trees for use in bins whose
+  # size exceeds a threshold).
   #
-  # Retrieval operations generally do not block, so may overlap with
-  # update operations. Retrievals reflect the results of the most
-  # recently _completed_ update operations holding upon their
-  # onset. (More formally, an update operation for a given key bears a
-  # _happens-before_ relation with any (non +nil+) retrieval for
-  # that key reporting the updated value.)  For aggregate operations
-  # such as +clear()+, concurrent retrievals may reflect insertion or removal
-  # of only some entries.  Similarly, the +each_pair+ iterator yields elements
-  # reflecting the state of the hash table at some point at or since
-  # the start of the +each_pair+. Bear in mind that the results of
-  # aggregate status methods including +size()+ and +empty?+} are typically
-  # useful only when a map is not undergoing concurrent updates in other
-  # threads. Otherwise the results of these methods reflect transient
-  # states that may be adequate for monitoring or estimation purposes, but not
-  # for program control.
+  # A hash table supporting full concurrency of retrievals and high expected
+  # concurrency for updates. However, even though all operations are
+  # thread-safe, retrieval operations do _not_ entail locking, and there is
+  # _not_ any support for locking the entire table in a way that prevents all
+  # access.
   #
-  # The table is dynamically expanded when there are too many
-  # collisions (i.e., keys that have distinct hash codes but fall into
-  # the same slot modulo the table size), with the expected average
-  # effect of maintaining roughly two bins per mapping (corresponding
-  # to a 0.75 load factor threshold for resizing). There may be much
-  # variance around this average as mappings are added and removed, but
-  # overall, this maintains a commonly accepted time/space tradeoff for
-  # hash tables.  However, resizing this or any other kind of hash
-  # table may be a relatively slow operation. When possible, it is a
-  # good idea to provide a size estimate as an optional :initial_capacity
+  # Retrieval operations generally do not block, so may overlap with update
+  # operations. Retrievals reflect the results of the most recently _completed_
+  # update operations holding upon their onset. (More formally, an update
+  # operation for a given key bears a _happens-before_ relation with any (non
+  # +nil+) retrieval for that key reporting the updated value.) For aggregate
+  # operations such as +clear()+, concurrent retrievals may reflect insertion or
+  # removal of only some entries. Similarly, the +each_pair+ iterator yields
+  # elements reflecting the state of the hash table at some point at or since
+  # the start of the +each_pair+. Bear in mind that the results of aggregate
+  # status methods including +size()+ and +empty?+} are typically useful only
+  # when a map is not undergoing concurrent updates in other threads. Otherwise
+  # the results of these methods reflect transient states that may be adequate
+  # for monitoring or estimation purposes, but not for program control.
+  #
+  # The table is dynamically expanded when there are too many collisions (i.e.,
+  # keys that have distinct hash codes but fall into the same slot modulo the
+  # table size), with the expected average effect of maintaining roughly two
+  # bins per mapping (corresponding to a 0.75 load factor threshold for
+  # resizing). There may be much variance around this average as mappings are
+  # added and removed, but overall, this maintains a commonly accepted
+  # time/space tradeoff for hash tables. However, resizing this or any other
+  # kind of hash table may be a relatively slow operation. When possible, it is
+  # a good idea to provide a size estimate as an optional :initial_capacity
   # initializer argument. An additional optional :load_factor constructor
-  # argument provides a further means of customizing initial table capacity
-  # by specifying the table density to be used in calculating the amount of
-  # space to allocate for the given number of elements. Note that using
-  # many keys with exactly the same +hash+ is a sure way to slow down
-  # performance of any hash table.
+  # argument provides a further means of customizing initial table capacity by
+  # specifying the table density to be used in calculating the amount of space
+  # to allocate for the given number of elements. Note that using many keys with
+  # exactly the same +hash+ is a sure way to slow down performance of any hash
+  # table.
   #
   # == Design overview
   #
-  # The primary design goal of this hash table is to maintain
-  # concurrent readability (typically method +[]+, but also
-  # iteration and related methods) while minimizing update
-  # contention. Secondary goals are to keep space consumption about
-  # the same or better than plain +Hash+, and to support high
+  # The primary design goal of this hash table is to maintain concurrent
+  # readability (typically method +[]+, but also iteration and related methods)
+  # while minimizing update contention. Secondary goals are to keep space
+  # consumption about the same or better than plain +Hash+, and to support high
   # initial insertion rates on an empty table by many threads.
   #
-  # Each key-value mapping is held in a +Node+. The validation-based
-  # approach explained below leads to a lot of code sprawl because
-  # retry-control precludes factoring into smaller methods.
+  # Each key-value mapping is held in a +Node+. The validation-based approach
+  # explained below leads to a lot of code sprawl because retry-control
+  # precludes factoring into smaller methods.
   #
-  # The table is lazily initialized to a power-of-two size upon the
-  # first insertion.  Each bin in the table normally contains a
-  # list of +Node+s (most often, the list has only zero or one +Node+).
-  # Table accesses require volatile/atomic reads, writes, and
-  # CASes. The lists of nodes within bins are always accurately traversable
-  # under volatile reads, so long as lookups check hash code
-  # and non-nullness of value before checking key equality.
+  # The table is lazily initialized to a power-of-two size upon the first
+  # insertion. Each bin in the table normally contains a list of +Node+s (most
+  # often, the list has only zero or one +Node+). Table accesses require
+  # volatile/atomic reads, writes, and CASes. The lists of nodes within bins are
+  # always accurately traversable under volatile reads, so long as lookups check
+  # hash code and non-nullness of value before checking key equality.
   #
-  # We use the top two bits of +Node+ hash fields for control
-  # purposes -- they are available anyway because of addressing
-  # constraints.  As explained further below, these top bits are
-  # used as follows:
-  #  00 - Normal
-  #  01 - Locked
-  #  11 - Locked and may have a thread waiting for lock
-  #  10 - +Node+ is a forwarding node
+  # We use the top two bits of +Node+ hash fields for control purposes -- they
+  # are available anyway because of addressing constraints. As explained further
+  # below, these top bits are used as follows:
   #
-  # The lower 28 bits of each +Node+'s hash field contain a
-  # the key's hash code, except for forwarding nodes, for which
-  # the lower bits are zero (and so always have hash field == +MOVED+).
+  #   - 00 - Normal
+  #   - 01 - Locked
+  #   - 11 - Locked and may have a thread waiting for lock
+  #   - 10 - +Node+ is a forwarding node
   #
-  # Insertion (via +[]=+ or its variants) of the first node in an
-  # empty bin is performed by just CASing it to the bin.  This is
-  # by far the most common case for put operations under most
-  # key/hash distributions.  Other update operations (insert,
-  # delete, and replace) require locks.  We do not want to waste
-  # the space required to associate a distinct lock object with
-  # each bin, so instead use the first node of a bin list itself as
-  # a lock. Blocking support for these locks relies +Util::CheapLockable.
-  # However, we also need a +try_lock+ construction, so we overlay
-  # these by using bits of the +Node+ hash field for lock control (see above),
-  # and so normally use builtin monitors only for blocking and signalling using
+  # The lower 28 bits of each +Node+'s hash field contain a the key's hash code,
+  # except for forwarding nodes, for which the lower bits are zero (and so
+  # always have hash field == +MOVED+).
+  #
+  # Insertion (via +[]=+ or its variants) of the first node in an empty bin is
+  # performed by just CASing it to the bin. This is by far the most common case
+  # for put operations under most key/hash distributions. Other update
+  # operations (insert, delete, and replace) require locks. We do not want to
+  # waste the space required to associate a distinct lock object with each bin,
+  # so instead use the first node of a bin list itself as a lock. Blocking
+  # support for these locks relies +Util::CheapLockable. However, we also need a
+  # +try_lock+ construction, so we overlay these by using bits of the +Node+
+  # hash field for lock control (see above), and so normally use builtin
+  # monitors only for blocking and signalling using
   # +cheap_wait+/+cheap_broadcast+ constructions. See +Node#try_await_lock+.
   #
-  # Using the first node of a list as a lock does not by itself
-  # suffice though: When a node is locked, any update must first
-  # validate that it is still the first node after locking it, and
-  # retry if not. Because new nodes are always appended to lists,
-  # once a node is first in a bin, it remains first until deleted
-  # or the bin becomes invalidated (upon resizing).  However,
-  # operations that only conditionally update may inspect nodes
-  # until the point of update. This is a converse of sorts to the
-  # lazy locking technique described by Herlihy & Shavit.
+  # Using the first node of a list as a lock does not by itself suffice though:
+  # When a node is locked, any update must first validate that it is still the
+  # first node after locking it, and retry if not. Because new nodes are always
+  # appended to lists, once a node is first in a bin, it remains first until
+  # deleted or the bin becomes invalidated (upon resizing). However, operations
+  # that only conditionally update may inspect nodes until the point of update.
+  # This is a converse of sorts to the lazy locking technique described by
+  # Herlihy & Shavit.
   #
-  # The main disadvantage of per-bin locks is that other update
-  # operations on other nodes in a bin list protected by the same
-  # lock can stall, for example when user +eql?+ or mapping
-  # functions take a long time.  However, statistically, under
-  # random hash codes, this is not a common problem.  Ideally, the
-  # frequency of nodes in bins follows a Poisson distribution
-  # (http://en.wikipedia.org/wiki/Poisson_distribution) with a
-  # parameter of about 0.5 on average, given the resizing threshold
-  # of 0.75, although with a large variance because of resizing
-  # granularity. Ignoring variance, the expected occurrences of
-  # list size k are (exp(-0.5) * pow(0.5, k) / factorial(k)). The
-  # first values are:
+  # The main disadvantage of per-bin locks is that other update operations on
+  # other nodes in a bin list protected by the same lock can stall, for example
+  # when user +eql?+ or mapping functions take a long time. However,
+  # statistically, under random hash codes, this is not a common problem.
+  # Ideally, the frequency of nodes in bins follows a Poisson distribution
+  # (http://en.wikipedia.org/wiki/Poisson_distribution) with a parameter of
+  # about 0.5 on average, given the resizing threshold of 0.75, although with a
+  # large variance because of resizing granularity. Ignoring variance, the
+  # expected occurrences of list size k are (exp(-0.5) * pow(0.5, k) /
+  # factorial(k)). The first values are:
   #
-  #  0:    0.60653066
-  #  1:    0.30326533
-  #  2:    0.07581633
-  #  3:    0.01263606
-  #  4:    0.00157952
-  #  5:    0.00015795
-  #  6:    0.00001316
-  #  7:    0.00000094
-  #  8:    0.00000006
-  #  more: less than 1 in ten million
+  #   - 0:    0.60653066
+  #   - 1:    0.30326533
+  #   - 2:    0.07581633
+  #   - 3:    0.01263606
+  #   - 4:    0.00157952
+  #   - 5:    0.00015795
+  #   - 6:    0.00001316
+  #   - 7:    0.00000094
+  #   - 8:    0.00000006
+  #   - more: less than 1 in ten million
   #
-  # Lock contention probability for two threads accessing distinct
-  # elements is roughly 1 / (8 * #elements) under random hashes.
+  # Lock contention probability for two threads accessing distinct elements is
+  # roughly 1 / (8 * #elements) under random hashes.
   #
-  # The table is resized when occupancy exceeds a percentage
-  # threshold (nominally, 0.75, but see below).  Only a single
-  # thread performs the resize (using field +size_control+, to arrange
-  # exclusion), but the table otherwise remains usable for reads
-  # and updates. Resizing proceeds by transferring bins, one by
-  # one, from the table to the next table.  Because we are using
-  # power-of-two expansion, the elements from each bin must either
-  # stay at same index, or move with a power of two offset. We
-  # eliminate unnecessary node creation by catching cases where old
-  # nodes can be reused because their next fields won't change.  On
-  # average, only about one-sixth of them need cloning when a table
-  # doubles. The nodes they replace will be garbage collectable as
-  # soon as they are no longer referenced by any reader thread that
-  # may be in the midst of concurrently traversing table.  Upon
-  # transfer, the old table bin contains only a special forwarding
-  # node (with hash field +MOVED+) that contains the next table as
-  # its key. On encountering a forwarding node, access and update
-  # operations restart, using the new table.
+  # The table is resized when occupancy exceeds a percentage threshold
+  # (nominally, 0.75, but see below). Only a single thread performs the resize
+  # (using field +size_control+, to arrange exclusion), but the table otherwise
+  # remains usable for reads and updates. Resizing proceeds by transferring
+  # bins, one by one, from the table to the next table. Because we are using
+  # power-of-two expansion, the elements from each bin must either stay at same
+  # index, or move with a power of two offset. We eliminate unnecessary node
+  # creation by catching cases where old nodes can be reused because their next
+  # fields won't change. On average, only about one-sixth of them need cloning
+  # when a table doubles. The nodes they replace will be garbage collectable as
+  # soon as they are no longer referenced by any reader thread that may be in
+  # the midst of concurrently traversing table. Upon transfer, the old table bin
+  # contains only a special forwarding node (with hash field +MOVED+) that
+  # contains the next table as its key. On encountering a forwarding node,
+  # access and update operations restart, using the new table.
   #
-  # Each bin transfer requires its bin lock. However, unlike other
-  # cases, a transfer can skip a bin if it fails to acquire its
-  # lock, and revisit it later. Method +rebuild+ maintains a buffer of
-  # TRANSFER_BUFFER_SIZE bins that have been skipped because of failure
-  # to acquire a lock, and blocks only if none are available
-  # (i.e., only very rarely). The transfer operation must also ensure
-  # that all accessible bins in both the old and new table are usable by
-  # any traversal. When there are no lock acquisition failures, this is
-  # arranged simply by proceeding from the last bin (+table.size - 1+) up
-  # towards the first.  Upon seeing a forwarding node, traversals arrange
-  # to move to the new table without revisiting nodes. However, when any
-  # node is skipped during a transfer, all earlier table bins may have
-  # become visible, so are initialized with a reverse-forwarding node back
-  # to the old table until the new ones are established. (This
-  # sometimes requires transiently locking a forwarding node, which
-  # is possible under the above encoding.) These more expensive
-  # mechanics trigger only when necessary.
+  # Each bin transfer requires its bin lock. However, unlike other cases, a
+  # transfer can skip a bin if it fails to acquire its lock, and revisit it
+  # later. Method +rebuild+ maintains a buffer of TRANSFER_BUFFER_SIZE bins that
+  # have been skipped because of failure to acquire a lock, and blocks only if
+  # none are available (i.e., only very rarely). The transfer operation must
+  # also ensure that all accessible bins in both the old and new table are
+  # usable by any traversal. When there are no lock acquisition failures, this
+  # is arranged simply by proceeding from the last bin (+table.size - 1+) up
+  # towards the first. Upon seeing a forwarding node, traversals arrange to move
+  # to the new table without revisiting nodes. However, when any node is skipped
+  # during a transfer, all earlier table bins may have become visible, so are
+  # initialized with a reverse-forwarding node back to the old table until the
+  # new ones are established. (This sometimes requires transiently locking a
+  # forwarding node, which is possible under the above encoding.) These more
+  # expensive mechanics trigger only when necessary.
   #
   # The traversal scheme also applies to partial traversals of
   # ranges of bins (via an alternate Traverser constructor)
@@ -229,10 +218,10 @@ module ThreadSafe
       end
     end
 
-    # Key-value entry. Nodes with a hash field of +MOVED+ are special,
-    # and do not contain user keys or values.  Otherwise, keys are never +nil+,
-    # and +NULL+ +value+ fields indicate that a node is in the process
-    # of being deleted or created. For purposes of read-only access, a key may be read
+    # Key-value entry. Nodes with a hash field of +MOVED+ are special, and do
+    # not contain user keys or values. Otherwise, keys are never +nil+, and
+    # +NULL+ +value+ fields indicate that a node is in the process of being
+    # deleted or created. For purposes of read-only access, a key may be read
     # before a value, but can only be used after checking value to be +!= NULL+.
     class Node
       extend Util::Volatile
@@ -259,17 +248,15 @@ module ThreadSafe
         self.next = next_node
       end
 
-      # Spins a while if +LOCKED+ bit set and this node is the first
-      # of its bin, and then sets +WAITING+ bits on hash field and
-      # blocks (once) if they are still set.  It is OK for this
-      # method to return even if lock is not available upon exit,
-      # which enables these simple single-wait mechanics.
+      # Spins a while if +LOCKED+ bit set and this node is the first of its bin,
+      # and then sets +WAITING+ bits on hash field and blocks (once) if they are
+      # still set. It is OK for this method to return even if lock is not
+      # available upon exit, which enables these simple single-wait mechanics.
       #
-      # The corresponding signalling operation is performed within
-      # callers: Upon detecting that +WAITING+ has been set when
-      # unlocking lock (via a failed CAS from non-waiting +LOCKED+
-      # state), unlockers acquire the +cheap_synchronize+ lock and
-      # perform a +cheap_broadcast+.
+      # The corresponding signalling operation is performed within callers: Upon
+      # detecting that +WAITING+ has been set when unlocking lock (via a failed
+      # CAS from non-waiting +LOCKED+ state), unlockers acquire the
+      # +cheap_synchronize+ lock and perform a +cheap_broadcast+.
       def try_await_lock(table, i)
         if table && i >= 0 && i < table.size # bounds check, TODO: why are we bounds checking?
           spins = SPIN_LOCK_ATTEMPTS
@@ -360,12 +347,12 @@ module ThreadSafe
     extend Util::Volatile
     attr_volatile :table, # The array of bins. Lazily initialized upon first insertion. Size is always a power of two.
 
-                  # Table initialization and resizing control.  When negative, the
-                  # table is being initialized or resized. Otherwise, when table is
-                  # null, holds the initial table size to use upon creation, or 0
-                  # for default. After initialization, holds the next element count
-                  # value upon which to resize the table.
-                  :size_control
+    # Table initialization and resizing control.  When negative, the
+    # table is being initialized or resized. Otherwise, when table is
+    # null, holds the initial table size to use upon creation, or 0
+    # for default. After initialization, holds the next element count
+    # value upon which to resize the table.
+    :size_control
 
     def initialize(options = nil)
       super()
@@ -786,10 +773,9 @@ module ThreadSafe
       current_table
     end
 
-    # If table is too small and not already resizing, creates next
-    # table and transfers bins.  Rechecks occupancy after a transfer
-    # to see if another resize is already needed because resizings
-    # are lagging additions.
+    # If table is too small and not already resizing, creates next table and
+    # transfers bins. Rechecks occupancy after a transfer to see if another
+    # resize is already needed because resizings are lagging additions.
     def check_for_resize
       while (current_table = table) && MAX_CAPACITY > (table_size = current_table.size) && NOW_RESIZING != (size_ctrl = size_control) && size_ctrl < @counter.sum
         try_in_resize_lock(current_table, size_ctrl) do

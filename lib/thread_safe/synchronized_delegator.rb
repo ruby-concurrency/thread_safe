@@ -9,9 +9,9 @@ require 'monitor'
 #   array = SynchronizedDelegator.new([]) # thread-safe
 #
 # A simple `Monitor` provides a very coarse-grained way to synchronize a given
-# object, in that it will cause synchronization for methods that have no
-# need for it, but this is a trivial way to get thread-safety where none may
-# exist currently on some implementations.
+# object, in that it will cause synchronization for methods that have no need
+# for it, but this is a trivial way to get thread-safety where none may exist
+# currently on some implementations.
 #
 # This class is currently being considered for inclusion into stdlib, via
 # https://bugs.ruby-lang.org/issues/8556

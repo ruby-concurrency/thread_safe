@@ -1,6 +1,7 @@
 module ThreadSafe
   module Util
-    # Provides a cheapest possible (mainly in terms of memory usage) +Mutex+ with the +ConditionVariable+ bundled in.
+    # Provides a cheapest possible (mainly in terms of memory usage) +Mutex+
+    # with the +ConditionVariable+ bundled in.
     #
     # Usage:
     #   class A
