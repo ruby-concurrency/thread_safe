@@ -1,14 +1,30 @@
-require 'thread'
-require 'rubygems'
-gem 'minitest', '>= 4'
+unless defined?(JRUBY_VERSION)
+  require 'simplecov'
+  require 'coveralls'
+
+  SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+    SimpleCov::Formatter::HTMLFormatter,
+    Coveralls::SimpleCov::Formatter
+  ]
+end
+
+SimpleCov.start do
+  project_name 'thread_safe'
+
+  add_filter '/examples/'
+  add_filter '/pkg/'
+  add_filter '/test/'
+  add_filter '/tasks/'
+  add_filter '/yard-template/'
+  add_filter '/yardoc/'
+
+  command_name 'Mintest'
+end
+
 require 'minitest/autorun'
 
-if Minitest.const_defined?('Test')
-  # We're on Minitest 5+. Nothing to do here.
-else
-  # Minitest 4 doesn't have Minitest::Test yet.
-  Minitest::Test = MiniTest::Unit::TestCase
-end
+require 'thread'
+require 'thread_safe'
 
 if defined?(JRUBY_VERSION) && ENV['TEST_NO_UNSAFE']
   # to be used like this: rake test TEST_NO_UNSAFE=true
