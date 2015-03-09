@@ -6,19 +6,19 @@ unless defined?(JRUBY_VERSION)
     SimpleCov::Formatter::HTMLFormatter,
     Coveralls::SimpleCov::Formatter
   ]
-end
 
-SimpleCov.start do
-  project_name 'thread_safe'
+  SimpleCov.start do
+    project_name 'thread_safe'
 
-  add_filter '/examples/'
-  add_filter '/pkg/'
-  add_filter '/test/'
-  add_filter '/tasks/'
-  add_filter '/yard-template/'
-  add_filter '/yardoc/'
+    add_filter '/examples/'
+    add_filter '/pkg/'
+    add_filter '/test/'
+    add_filter '/tasks/'
+    add_filter '/yard-template/'
+    add_filter '/yardoc/'
 
-  command_name 'Mintest'
+    command_name 'Mintest'
+  end
 end
 
 require 'minitest/autorun'
