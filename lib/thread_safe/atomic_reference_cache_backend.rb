@@ -44,7 +44,7 @@ module ThreadSafe
   # exactly the same +hash+ is a sure way to slow down performance of any hash
   # table.
   #
-  # == Design overview
+  # ## Design overview
   #
   # The primary design goal of this hash table is to maintain concurrent
   # readability (typically method +[]+, but also iteration and related methods)

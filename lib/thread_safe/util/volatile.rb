@@ -1,7 +1,9 @@
 module ThreadSafe
   module Util
     module Volatile
-      # Provides +volatile+ (in the JVM's sense) attribute accessors implemented atop of the +AtomicReference+s.
+      # Provides +volatile+ (in the JVM's sense) attribute accessors implemented
+      # atop of the +AtomicReference+s.
+      #
       # Usage:
       #   class Foo
       #     extend ThreadSafe::Util::Volatile
