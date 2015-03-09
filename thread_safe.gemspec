@@ -20,7 +20,7 @@ Gem::Specification.new do |gem|
   gem.version       = ThreadSafe::VERSION
   gem.license       = "Apache-2.0"
 
-  gem.add_development_dependency 'atomic', ['>= 1.1.7', '< 2']
+  gem.add_development_dependency 'atomic', '= 1.1.16'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'minitest', '>= 4'
 end
