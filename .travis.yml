@@ -39,3 +39,5 @@ matrix:
     - rvm: ruby-head
     - rvm: jruby-head
     - rvm: 1.9.3
+
+script: "rake TESTOPTS='--seed=1'"

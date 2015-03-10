@@ -29,6 +29,8 @@ Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new(color: true)
 require 'thread'
 require 'thread_safe'
 
+THREADS = (RUBY_ENGINE == 'ruby' ? 100 : 10)
+
 if defined?(JRUBY_VERSION) && ENV['TEST_NO_UNSAFE']
   # to be used like this: rake test TEST_NO_UNSAFE=true
   load 'test/package.jar'
