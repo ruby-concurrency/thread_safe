@@ -103,25 +103,25 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>A Ruby port of the Doug Lea&#39;s jsr166e.LondAdder class version 1.8
-available in public domain.</p>
+    
+<p>A Ruby port of the Doug Lea's jsr166e.LondAdder class version 1.8 available
+in public domain.</p>
 
-<p>Original source code available here:
-<a href="http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/LongAdder.java?revision=1.8">http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/LongAdder.java?revision=1.8</a></p>
+<p>Original source code available here: <a
+href="http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/LongAdder.java?revision=1.8">gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/LongAdder.java?revision=1.8</a></p>
 
-<p>One or more variables that together maintain an initially zero
-sum. When updates (method +add+) are contended across threads,
-the set of variables may grow dynamically to reduce contention.
-Method +sum+ returns the current total combined across the
-variables maintaining the sum.</p>
+<p>One or more variables that together maintain an initially zero sum. When
+updates (method <code>add</code>) are contended across threads, the set of
+variables may grow dynamically to reduce contention. Method
+<code>sum</code> returns the current total combined across the variables
+maintaining the sum.</p>
 
-<p>This class is usually preferable to single +Atomic+ reference when
-multiple threads update a common sum that is used for purposes such
-as collecting statistics, not for fine-grained synchronization
-control.  Under low update contention, the two classes have similar
-characteristics. But under high contention, expected throughput of
-this class is significantly higher, at the expense of higher space
-consumption.</p>
+<p>This class is usually preferable to single <code>Atomic</code> reference
+when multiple threads update a common sum that is used for purposes such as
+collecting statistics, not for fine-grained synchronization control. Under
+low update contention, the two classes have similar characteristics. But
+under high contention, expected throughput of this class is significantly
+higher, at the expense of higher space consumption.</p>
 
 
   </div>
@@ -164,7 +164,8 @@ consumption.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Adds the given value.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>Adds the given value.</p>
 </div></span>
   
 </li>
@@ -253,7 +254,8 @@ consumption.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Returns the current sum.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the current sum.</p>
 </div></span>
   
 </li>
@@ -289,7 +291,8 @@ consumption.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Adds the given value.</p>
+    
+<p>Adds the given value.</p>
 
 
   </div>
@@ -431,11 +434,11 @@ consumption.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Returns the current sum.  The returned value is <em>NOT</em> an
-atomic snapshot: Invocation in the absence of concurrent
-updates returns an accurate result, but concurrent updates that
-occur while the sum is being calculated might not be
-incorporated.</p>
+    
+<p>Returns the current sum. The returned value is <em>NOT</em> an atomic
+snapshot: Invocation in the absence of concurrent updates returns an
+accurate result, but concurrent updates that occur while the sum is being
+calculated might not be incorporated.</p>
 
 
   </div>
@@ -481,9 +484,9 @@ incorporated.</p>
 </div>
 
     <div id="footer">
-  Generated on Sun Mar  8 18:12:19 2015 by
+  Generated on Wed Mar 11 11:06:08 2015 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.0).
+  0.8.7.6 (ruby-1.9.3).
 </div>
 
 <script>

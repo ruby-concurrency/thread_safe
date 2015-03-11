@@ -107,7 +107,8 @@
         <dt id="KEY_ERROR-constant" class="">KEY_ERROR =
           <div class="docstring">
   <div class="discussion">
-    <p>there is no KeyError in 1.8 mode</p>
+    
+<p>there is no KeyError in 1.8 mode</p>
 
 
   </div>
@@ -289,7 +290,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>A new instance of Cache.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>A new instance of Cache.</p>
 </div></span>
   
 </li>
@@ -490,7 +492,8 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Returns a new instance of Cache</p>
+    
+<p>Returns a new instance of Cache</p>
 
 
   </div>
@@ -580,7 +583,7 @@
   <span class='kw'>if</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='kw'>super</span> <span class='comment'># non-falsy value is an existing mapping, return it right away
 </span>    <span class='id identifier rubyid_value'>value</span>
   <span class='comment'># re-check is done with get_or_default(key, NULL) instead of a simple !key?(key) in order to avoid a race condition, whereby by the time the current thread gets to the key?(key) call
-</span>  <span class='comment'># a key =&gt; value mapping might have already been created by a different thread (key?(key) would then return true, this elsif branch wouldn&#39;t be taken and an incorrent +nil+ value
+</span>  <span class='comment'># a key =&gt; value mapping might have already been created by a different thread (key?(key) would then return true, this elsif branch wouldn't be taken and an incorrent +nil+ value
 </span>  <span class='comment'># would be returned)
 </span>  <span class='comment'># note: nil == value check is not technically necessary
 </span>  <span class='kw'>elsif</span> <span class='ivar'>@default_proc</span> <span class='op'>&amp;&amp;</span> <span class='kw'>nil</span> <span class='op'>==</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>&amp;&amp;</span> <span class='const'>NULL</span> <span class='op'>==</span> <span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_get_or_default'>get_or_default</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='const'>NULL</span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -906,7 +909,7 @@
       <pre class="code"><span class="info file"># File 'lib/thread_safe/cache.rb', line 125</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_marshal_dump'>marshal_dump</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>TypeError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>can&#39;t dump hash with default proc</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='ivar'>@default_proc</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>TypeError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>can't dump hash with default proc</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='ivar'>@default_proc</span>
   <span class='id identifier rubyid_h'>h</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
   <span class='id identifier rubyid_each_pair'>each_pair</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_k'>k</span><span class='comma'>,</span> <span class='id identifier rubyid_v'>v</span><span class='op'>|</span> <span class='id identifier rubyid_h'>h</span><span class='lbracket'>[</span><span class='id identifier rubyid_k'>k</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_v'>v</span><span class='rbrace'>}</span>
   <span class='id identifier rubyid_h'>h</span>
@@ -1119,9 +1122,9 @@
 </div>
 
     <div id="footer">
-  Generated on Sun Mar  8 18:12:19 2015 by
+  Generated on Wed Mar 11 11:06:08 2015 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.0).
+  0.8.7.6 (ruby-1.9.3).
 </div>
 
 <script>

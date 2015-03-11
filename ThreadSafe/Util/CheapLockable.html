@@ -94,12 +94,11 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>Provides a cheapest possible (mainly in terms of memory usage) +Mutex+
-with the +ConditionVariable+ bundled in.</p>
+    
+<p>Provides a cheapest possible (mainly in terms of memory usage)
+<code>Mutex</code> with the <code>ConditionVariable</code> bundled in.</p>
 
-<p>Usage:
-  class A
-    include CheapLockable</p>
+<p>Usage:  class A  include CheapLockable</p>
 
 <pre class="code ruby"><code class="ruby"><span class='kw'>def</span> <span class='id identifier rubyid_do_exlusively'>do_exlusively</span>
   <span class='id identifier rubyid_cheap_synchronize'>cheap_synchronize</span> <span class='lbrace'>{</span> <span class='kw'>yield</span> <span class='rbrace'>}</span>
@@ -159,7 +158,9 @@ with the +ConditionVariable+ bundled in.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Provides +volatile+ (in the JVM&#39;s sense) attribute accessors implemented atop of the +AtomicReference+s.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>Provides <code>volatile</code> (in the JVM's sense) attribute accessors
+implemented atop of the +AtomicReference+s.</p>
 </div></span>
   
 </li>
@@ -192,11 +193,12 @@ with the +ConditionVariable+ bundled in.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Provides +volatile+ (in the JVM&#39;s sense) attribute accessors implemented atop of the +AtomicReference+s.
-Usage:
-  class Foo
-    extend ThreadSafe::Util::Volatile
-    attr_volatile :foo, :bar</p>
+    
+<p>Provides <code>volatile</code> (in the JVM's sense) attribute accessors
+implemented atop of the +AtomicReference+s.</p>
+
+<p>Usage:  class Foo  extend ThreadSafe::Util::Volatile  attr_volatile :foo,
+:bar</p>
 
 <pre class="code ruby"><code class="ruby"><span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_bar'>bar</span><span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='rparen'>)</span> <span class='comment'># must super() into parent initializers before using the volatile attribute accessors
@@ -226,9 +228,9 @@ Usage:
 </div>
 
     <div id="footer">
-  Generated on Sun Mar  8 18:12:19 2015 by
+  Generated on Wed Mar 11 11:06:07 2015 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.0).
+  0.8.7.6 (ruby-1.9.3).
 </div>
 
 <script>

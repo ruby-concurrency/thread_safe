@@ -105,34 +105,37 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>A Ruby port of the Doug Lea&#39;s jsr166e.ConcurrentHashMapV8 class version 1.59
-available in public domain.</p>
+    
+<p>A Ruby port of the Doug Lea's jsr166e.ConcurrentHashMapV8 class version
+1.59 available in public domain.</p>
 
-<p>Original source code available here:
-<a href="http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/ConcurrentHashMapV8.java?revision=1.59">http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/ConcurrentHashMapV8.java?revision=1.59</a></p>
+<p>Original source code available here: <a
+href="http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/ConcurrentHashMapV8.java?revision=1.59">gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/ConcurrentHashMapV8.java?revision=1.59</a></p>
 
-<p>The Ruby port skips out the +TreeBin+ (red-black trees for use in bins whose
-size exceeds a threshold).</p>
+<p>The Ruby port skips out the <code>TreeBin</code> (red-black trees for use
+in bins whose size exceeds a threshold).</p>
 
 <p>A hash table supporting full concurrency of retrievals and high expected
 concurrency for updates. However, even though all operations are
-thread-safe, retrieval operations do <em>not</em> entail locking, and there is
-<em>not</em> any support for locking the entire table in a way that prevents all
-access.</p>
+thread-safe, retrieval operations do <em>not</em> entail locking, and there
+is <em>not</em> any support for locking the entire table in a way that
+prevents all access.</p>
 
 <p>Retrieval operations generally do not block, so may overlap with update
-operations. Retrievals reflect the results of the most recently <em>completed</em>
-update operations holding upon their onset. (More formally, an update
-operation for a given key bears a <em>happens-before</em> relation with any (non
-+nil+) retrieval for that key reporting the updated value.) For aggregate
-operations such as +clear()+, concurrent retrievals may reflect insertion or
-removal of only some entries. Similarly, the +each_pair+ iterator yields
+operations. Retrievals reflect the results of the most recently
+<em>completed</em> update operations holding upon their onset. (More
+formally, an update operation for a given key bears a
+<em>happens-before</em> relation with any (non <code>nil</code>) retrieval
+for that key reporting the updated value.) For aggregate operations such as
++clear()+, concurrent retrievals may reflect insertion or removal of only
+some entries. Similarly, the <code>each_pair</code> iterator yields
 elements reflecting the state of the hash table at some point at or since
-the start of the +each_pair+. Bear in mind that the results of aggregate
-status methods including +size()+ and +empty?+} are typically useful only
-when a map is not undergoing concurrent updates in other threads. Otherwise
-the results of these methods reflect transient states that may be adequate
-for monitoring or estimation purposes, but not for program control.</p>
+the start of the <code>each_pair</code>. Bear in mind that the results of
+aggregate status methods including +size()+ and <code>empty?</code>} are
+typically useful only when a map is not undergoing concurrent updates in
+other threads. Otherwise the results of these methods reflect transient
+states that may be adequate for monitoring or estimation purposes, but not
+for program control.</p>
 
 <p>The table is dynamically expanded when there are too many collisions (i.e.,
 keys that have distinct hash codes but fall into the same slot modulo the
@@ -146,43 +149,46 @@ a good idea to provide a size estimate as an optional :initial_capacity
 initializer argument. An additional optional :load_factor constructor
 argument provides a further means of customizing initial table capacity by
 specifying the table density to be used in calculating the amount of space
-to allocate for the given number of elements. Note that using many keys with
-exactly the same +hash+ is a sure way to slow down performance of any hash
-table.</p>
+to allocate for the given number of elements. Note that using many keys
+with exactly the same <code>hash</code> is a sure way to slow down
+performance of any hash table.</p>
 
-<p>== Design overview</p>
+<h2 id="label-Design+overview">Design overview</h2>
 
 <p>The primary design goal of this hash table is to maintain concurrent
 readability (typically method +[]+, but also iteration and related methods)
 while minimizing update contention. Secondary goals are to keep space
-consumption about the same or better than plain +Hash+, and to support high
-initial insertion rates on an empty table by many threads.</p>
+consumption about the same or better than plain <code>Hash</code>, and to
+support high initial insertion rates on an empty table by many threads.</p>
 
-<p>Each key-value mapping is held in a +Node+. The validation-based approach
-explained below leads to a lot of code sprawl because retry-control
-precludes factoring into smaller methods.</p>
+<p>Each key-value mapping is held in a <code>Node</code>. The validation-based
+approach explained below leads to a lot of code sprawl because
+retry-control precludes factoring into smaller methods.</p>
 
 <p>The table is lazily initialized to a power-of-two size upon the first
 insertion. Each bin in the table normally contains a list of +Node+s (most
-often, the list has only zero or one +Node+). Table accesses require
-volatile/atomic reads, writes, and CASes. The lists of nodes within bins are
-always accurately traversable under volatile reads, so long as lookups check
-hash code and non-nullness of value before checking key equality.</p>
+often, the list has only zero or one <code>Node</code>). Table accesses
+require volatile/atomic reads, writes, and CASes. The lists of nodes within
+bins are always accurately traversable under volatile reads, so long as
+lookups check hash code and non-nullness of value before checking key
+equality.</p>
 
-<p>We use the top two bits of +Node+ hash fields for control purposes -- they
-are available anyway because of addressing constraints. As explained further
-below, these top bits are used as follows:</p>
+<p>We use the top two bits of <code>Node</code> hash fields for control
+purposes -- they are available anyway because of addressing constraints. As
+explained further below, these top bits are used as follows:</p>
+<ul><li>
+<p>00 - Normal</p>
+</li><li>
+<p>01 - Locked</p>
+</li><li>
+<p>11 - Locked and may have a thread waiting for lock</p>
+</li><li>
+<p>10 - <code>Node</code> is a forwarding node</p>
+</li></ul>
 
-<ul>
-<li>00 - Normal</li>
-<li>01 - Locked</li>
-<li>11 - Locked and may have a thread waiting for lock</li>
-<li>10 - +Node+ is a forwarding node</li>
-</ul>
-
-<p>The lower 28 bits of each +Node+&#39;s hash field contain a the key&#39;s hash code,
-except for forwarding nodes, for which the lower bits are zero (and so
-always have hash field == +MOVED+).</p>
+<p>The lower 28 bits of each <code>Node</code>'s hash field contain a the
+key's hash code, except for forwarding nodes, for which the lower bits are
+zero (and so always have hash field == <code>MOVED</code>).</p>
 
 <p>Insertion (via +[]=+ or its variants) of the first node in an empty bin is
 performed by just CASing it to the bin. This is by far the most common case
@@ -190,11 +196,12 @@ for put operations under most key/hash distributions. Other update
 operations (insert, delete, and replace) require locks. We do not want to
 waste the space required to associate a distinct lock object with each bin,
 so instead use the first node of a bin list itself as a lock. Blocking
-support for these locks relies +Util::CheapLockable. However, we also need a
-+try_lock+ construction, so we overlay these by using bits of the +Node+
-hash field for lock control (see above), and so normally use builtin
-monitors only for blocking and signalling using
-+cheap_wait+/+cheap_broadcast+ constructions. See +Node#try_await_lock+.</p>
+support for these locks relies +Util::CheapLockable. However, we also need
+a <code>try_lock</code> construction, so we overlay these by using bits of
+the <code>Node</code> hash field for lock control (see above), and so
+normally use builtin monitors only for blocking and signalling using
+<code>cheap_wait</code>/<code>cheap_broadcast</code> constructions. See
++Node#try_await_lock+.</p>
 
 <p>Using the first node of a list as a lock does not by itself suffice though:
 When a node is locked, any update must first validate that it is still the
@@ -207,86 +214,93 @@ Herlihy &amp; Shavit.</p>
 
 <p>The main disadvantage of per-bin locks is that other update operations on
 other nodes in a bin list protected by the same lock can stall, for example
-when user +eql?+ or mapping functions take a long time. However,
+when user <code>eql?</code> or mapping functions take a long time. However,
 statistically, under random hash codes, this is not a common problem.
-Ideally, the frequency of nodes in bins follows a Poisson distribution
-(<a href="http://en.wikipedia.org/wiki/Poisson_distribution">http://en.wikipedia.org/wiki/Poisson_distribution</a>) with a parameter of
-about 0.5 on average, given the resizing threshold of 0.75, although with a
-large variance because of resizing granularity. Ignoring variance, the
-expected occurrences of list size k are (exp(-0.5) * pow(0.5, k) /
-factorial(k)). The first values are:</p>
-
-<ul>
-<li>0:    0.60653066</li>
-<li>1:    0.30326533</li>
-<li>2:    0.07581633</li>
-<li>3:    0.01263606</li>
-<li>4:    0.00157952</li>
-<li>5:    0.00015795</li>
-<li>6:    0.00001316</li>
-<li>7:    0.00000094</li>
-<li>8:    0.00000006</li>
-<li>more: less than 1 in ten million</li>
-</ul>
+Ideally, the frequency of nodes in bins follows a Poisson distribution (<a
+href="http://en.wikipedia.org/wiki/Poisson_distribution">en.wikipedia.org/wiki/Poisson_distribution</a>)
+with a parameter of about 0.5 on average, given the resizing threshold of
+0.75, although with a large variance because of resizing granularity.
+Ignoring variance, the expected occurrences of list size k are (exp(-0.5) *
+pow(0.5, k) / factorial(k)). The first values are:</p>
+<ul><li>
+<p>0: 0.60653066</p>
+</li><li>
+<p>1: 0.30326533</p>
+</li><li>
+<p>2: 0.07581633</p>
+</li><li>
+<p>3: 0.01263606</p>
+</li><li>
+<p>4: 0.00157952</p>
+</li><li>
+<p>5: 0.00015795</p>
+</li><li>
+<p>6: 0.00001316</p>
+</li><li>
+<p>7: 0.00000094</p>
+</li><li>
+<p>8: 0.00000006</p>
+</li><li>
+<p>more: less than 1 in ten million</p>
+</li></ul>
 
 <p>Lock contention probability for two threads accessing distinct elements is
 roughly 1 / (8 * #elements) under random hashes.</p>
 
 <p>The table is resized when occupancy exceeds a percentage threshold
 (nominally, 0.75, but see below). Only a single thread performs the resize
-(using field +size_control+, to arrange exclusion), but the table otherwise
-remains usable for reads and updates. Resizing proceeds by transferring
-bins, one by one, from the table to the next table. Because we are using
-power-of-two expansion, the elements from each bin must either stay at same
-index, or move with a power of two offset. We eliminate unnecessary node
-creation by catching cases where old nodes can be reused because their next
-fields won&#39;t change. On average, only about one-sixth of them need cloning
-when a table doubles. The nodes they replace will be garbage collectable as
-soon as they are no longer referenced by any reader thread that may be in
-the midst of concurrently traversing table. Upon transfer, the old table bin
-contains only a special forwarding node (with hash field +MOVED+) that
-contains the next table as its key. On encountering a forwarding node,
-access and update operations restart, using the new table.</p>
+(using field <code>size_control</code>, to arrange exclusion), but the
+table otherwise remains usable for reads and updates. Resizing proceeds by
+transferring bins, one by one, from the table to the next table. Because we
+are using power-of-two expansion, the elements from each bin must either
+stay at same index, or move with a power of two offset. We eliminate
+unnecessary node creation by catching cases where old nodes can be reused
+because their next fields won't change. On average, only about one-sixth of
+them need cloning when a table doubles. The nodes they replace will be
+garbage collectable as soon as they are no longer referenced by any reader
+thread that may be in the midst of concurrently traversing table. Upon
+transfer, the old table bin contains only a special forwarding node (with
+hash field <code>MOVED</code>) that contains the next table as its key. On
+encountering a forwarding node, access and update operations restart, using
+the new table.</p>
 
 <p>Each bin transfer requires its bin lock. However, unlike other cases, a
 transfer can skip a bin if it fails to acquire its lock, and revisit it
-later. Method +rebuild+ maintains a buffer of TRANSFER_BUFFER_SIZE bins that
-have been skipped because of failure to acquire a lock, and blocks only if
-none are available (i.e., only very rarely). The transfer operation must
-also ensure that all accessible bins in both the old and new table are
-usable by any traversal. When there are no lock acquisition failures, this
-is arranged simply by proceeding from the last bin (+table.size - 1+) up
-towards the first. Upon seeing a forwarding node, traversals arrange to move
-to the new table without revisiting nodes. However, when any node is skipped
-during a transfer, all earlier table bins may have become visible, so are
-initialized with a reverse-forwarding node back to the old table until the
-new ones are established. (This sometimes requires transiently locking a
-forwarding node, which is possible under the above encoding.) These more
-expensive mechanics trigger only when necessary.</p>
+later. Method <code>rebuild</code> maintains a buffer of
+TRANSFER_BUFFER_SIZE bins that have been skipped because of failure to
+acquire a lock, and blocks only if none are available (i.e., only very
+rarely). The transfer operation must also ensure that all accessible bins
+in both the old and new table are usable by any traversal. When there are
+no lock acquisition failures, this is arranged simply by proceeding from
+the last bin (+table.size - 1+) up towards the first. Upon seeing a
+forwarding node, traversals arrange to move to the new table without
+revisiting nodes. However, when any node is skipped during a transfer, all
+earlier table bins may have become visible, so are initialized with a
+reverse-forwarding node back to the old table until the new ones are
+established. (This sometimes requires transiently locking a forwarding
+node, which is possible under the above encoding.) These more expensive
+mechanics trigger only when necessary.</p>
 
-<p>The traversal scheme also applies to partial traversals of
-ranges of bins (via an alternate Traverser constructor)
-to support partitioned aggregate operations.  Also, read-only
-operations give up if ever forwarded to a null table, which
-provides support for shutdown-style clearing, which is also not
-currently implemented.</p>
+<p>The traversal scheme also applies to partial traversals of ranges of bins
+(via an alternate Traverser constructor) to support partitioned aggregate
+operations. Also, read-only operations give up if ever forwarded to a null
+table, which provides support for shutdown-style clearing, which is also
+not currently implemented.</p>
 
 <p>Lazy table initialization minimizes footprint until first use.</p>
 
-<p>The element count is maintained using a +ThreadSafe::Util::Adder+,
-which avoids contention on updates but can encounter cache thrashing
-if read too frequently during concurrent access. To avoid reading so
-often, resizing is attempted either when a bin lock is
-contended, or upon adding to a bin already holding two or more
-nodes (checked before adding in the +x_if_absent+ methods, after
-adding in others). Under uniform hash distributions, the
-probability of this occurring at threshold is around 13%,
-meaning that only about 1 in 8 puts check threshold (and after
-resizing, many fewer do so). But this approximation has high
-variance for small table sizes, so we check on any collision
-for sizes &lt;= 64. The bulk putAll operation further reduces
-contention by only committing count updates upon these size
-checks.</p>
+<p>The element count is maintained using a +ThreadSafe::Util::Adder+, which
+avoids contention on updates but can encounter cache thrashing if read too
+frequently during concurrent access. To avoid reading so often, resizing is
+attempted either when a bin lock is contended, or upon adding to a bin
+already holding two or more nodes (checked before adding in the
+<code>x_if_absent</code> methods, after adding in others). Under uniform
+hash distributions, the probability of this occurring at threshold is
+around 13%, meaning that only about 1 in 8 puts check threshold (and after
+resizing, many fewer do so). But this approximation has high variance for
+small table sizes, so we check on any collision for sizes &lt;= 64. The
+bulk putAll operation further reduces contention by only committing count
+updates upon these size checks.</p>
 
 
   </div>
@@ -312,7 +326,8 @@ checks.</p>
         <dt id="MOVED-constant" class="">MOVED =
           <div class="docstring">
   <div class="discussion">
-    <p>shorthands</p>
+    
+<p>shorthands</p>
 
 
   </div>
@@ -357,9 +372,9 @@ checks.</p>
         <dt id="TRANSFER_BUFFER_SIZE-constant" class="">TRANSFER_BUFFER_SIZE =
           <div class="docstring">
   <div class="discussion">
-    <p>The buffer size for skipped bins during transfers. The
-value is arbitrary but should be large enough to avoid
-most locking stalls during resizes.</p>
+    
+<p>The buffer size for skipped bins during transfers. The value is arbitrary
+but should be large enough to avoid most locking stalls during resizes.</p>
 
 
   </div>
@@ -410,7 +425,9 @@ most locking stalls during resizes.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Provides +volatile+ (in the JVM&#39;s sense) attribute accessors implemented atop of the +AtomicReference+s.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>Provides <code>volatile</code> (in the JVM's sense) attribute accessors
+implemented atop of the +AtomicReference+s.</p>
 </div></span>
   
 </li>
@@ -486,7 +503,8 @@ most locking stalls during resizes.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Implementation for clear.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>Implementation for clear.</p>
 </div></span>
   
 </li>
@@ -663,7 +681,8 @@ most locking stalls during resizes.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>internalPut in the original CHMV8.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>internalPut in the original CHMV8.</p>
 </div></span>
   
 </li>
@@ -710,7 +729,8 @@ most locking stalls during resizes.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>A new instance of AtomicReferenceCacheBackend.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>A new instance of AtomicReferenceCacheBackend.</p>
 </div></span>
   
 </li>
@@ -845,7 +865,8 @@ most locking stalls during resizes.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Returns a new instance of AtomicReferenceCacheBackend</p>
+    
+<p>Returns a new instance of AtomicReferenceCacheBackend</p>
 
 
   </div>
@@ -903,11 +924,12 @@ most locking stalls during resizes.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Provides +volatile+ (in the JVM&#39;s sense) attribute accessors implemented atop of the +AtomicReference+s.
-Usage:
-  class Foo
-    extend ThreadSafe::Util::Volatile
-    attr_volatile :foo, :bar</p>
+    
+<p>Provides <code>volatile</code> (in the JVM's sense) attribute accessors
+implemented atop of the +AtomicReference+s.</p>
+
+<p>Usage:  class Foo  extend ThreadSafe::Util::Volatile  attr_volatile :foo,
+:bar</p>
 
 <pre class="code ruby"><code class="ruby"><span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_bar'>bar</span><span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='rparen'>)</span> <span class='comment'># must super() into parent initializers before using the volatile attribute accessors
@@ -1011,7 +1033,8 @@ Usage:
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Implementation for clear. Steps through each bin, removing all nodes.</p>
+    
+<p>Implementation for clear. Steps through each bin, removing all nodes.</p>
 
 
   </div>
@@ -1455,7 +1478,8 @@ Usage:
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>internalPut in the original CHMV8</p>
+    
+<p>internalPut in the original CHMV8</p>
 
 
   </div>
@@ -1767,9 +1791,9 @@ Usage:
 </div>
 
     <div id="footer">
-  Generated on Sun Mar  8 18:12:19 2015 by
+  Generated on Wed Mar 11 11:06:10 2015 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.0).
+  0.8.7.6 (ruby-1.9.3).
 </div>
 
 <script>

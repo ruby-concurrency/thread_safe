@@ -94,17 +94,14 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>A xorshift random number (positive +Fixnum+s) generator, provides
+    
+<p>A xorshift random number (positive +Fixnum+s) generator, provides
 reasonably cheap way to generate thread local random numbers without
-contending for the global +Kernel.rand+.</p>
+contending for the global <code>Kernel.rand</code>.</p>
 
-<p>Usage:
-  x = XorShiftRandom.get # uses Kernel.rand to generate an initial seed
-  while true
-    if (x = XorShiftRandom.xorshift).odd? # thread-localy generate a next random number
-      do_something_at_random
-    end
-  end</p>
+<p>Usage:  x = XorShiftRandom.get # uses Kernel.rand to generate an initial
+seed  while true  if (x = XorShiftRandom.xorshift).odd? # thread-localy
+generate a next random number  do_something_at_random  end  end</p>
 
 
   </div>
@@ -156,7 +153,9 @@ contending for the global +Kernel.rand+.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Generates an initial non-zero positive +Fixnum+ via +Kernel.rand+.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>Generates an initial non-zero positive <code>Fixnum</code> via
+<code>Kernel.rand</code>.</p>
 </div></span>
   
 </li>
@@ -179,7 +178,9 @@ contending for the global +Kernel.rand+.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>using the &quot;yˆ=y&gt;&gt;a; yˆ=y&gt;c;&quot; transform with the (a,b,c) tuple with values (1,1,54) to minimise Bignum overflows.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>using the “yˆ=y&gt;&gt;a; yˆ=y&gt;c;” transform with the (a,b,c) tuple with
+values (1,1,54) to minimise Bignum overflows.</p>
 </div></span>
   
 </li>
@@ -211,7 +212,9 @@ contending for the global +Kernel.rand+.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Generates an initial non-zero positive +Fixnum+ via +Kernel.rand+.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>Generates an initial non-zero positive <code>Fixnum</code> via
+<code>Kernel.rand</code>.</p>
 </div></span>
   
 </li>
@@ -234,7 +237,9 @@ contending for the global +Kernel.rand+.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>using the &quot;yˆ=y&gt;&gt;a; yˆ=y&gt;c;&quot; transform with the (a,b,c) tuple with values (1,1,54) to minimise Bignum overflows.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>using the “yˆ=y&gt;&gt;a; yˆ=y&gt;c;” transform with the (a,b,c) tuple with
+values (1,1,54) to minimise Bignum overflows.</p>
 </div></span>
   
 </li>
@@ -260,7 +265,9 @@ contending for the global +Kernel.rand+.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Generates an initial non-zero positive +Fixnum+ via +Kernel.rand+.</p>
+    
+<p>Generates an initial non-zero positive <code>Fixnum</code> via
+<code>Kernel.rand</code>.</p>
 
 
   </div>
@@ -282,7 +289,7 @@ contending for the global +Kernel.rand+.</p>
       <pre class="code"><span class="info file"># File 'lib/thread_safe/util/xor_shift_random.rb', line 19</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get'>get</span>
-  <span class='const'>Kernel</span><span class='period'>.</span><span class='id identifier rubyid_rand'>rand</span><span class='lparen'>(</span><span class='const'>MAX_XOR_SHIFTABLE_INT</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='int'>1</span> <span class='comment'># 0 can&#39;t be xorshifted
+  <span class='const'>Kernel</span><span class='period'>.</span><span class='id identifier rubyid_rand'>rand</span><span class='lparen'>(</span><span class='const'>MAX_XOR_SHIFTABLE_INT</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='int'>1</span> <span class='comment'># 0 can't be xorshifted
 </span><span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -300,7 +307,9 @@ contending for the global +Kernel.rand+.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>using the &quot;yˆ=y&gt;&gt;a; yˆ=y&lt;<b; yˆ=y>&gt;c;&quot; transform with the (a,b,c) tuple with values (1,1,54) to minimise Bignum overflows</p>
+    
+<p>using the “yˆ=y&gt;&gt;a; yˆ=y&lt;&lt;b; yˆ=y&gt;&gt;c;” transform with the
+(a,b,c) tuple with values (1,1,54) to minimise Bignum overflows</p>
 
 
   </div>
@@ -350,7 +359,9 @@ contending for the global +Kernel.rand+.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Generates an initial non-zero positive +Fixnum+ via +Kernel.rand+.</p>
+    
+<p>Generates an initial non-zero positive <code>Fixnum</code> via
+<code>Kernel.rand</code>.</p>
 
 
   </div>
@@ -372,7 +383,7 @@ contending for the global +Kernel.rand+.</p>
       <pre class="code"><span class="info file"># File 'lib/thread_safe/util/xor_shift_random.rb', line 19</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get'>get</span>
-  <span class='const'>Kernel</span><span class='period'>.</span><span class='id identifier rubyid_rand'>rand</span><span class='lparen'>(</span><span class='const'>MAX_XOR_SHIFTABLE_INT</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='int'>1</span> <span class='comment'># 0 can&#39;t be xorshifted
+  <span class='const'>Kernel</span><span class='period'>.</span><span class='id identifier rubyid_rand'>rand</span><span class='lparen'>(</span><span class='const'>MAX_XOR_SHIFTABLE_INT</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='int'>1</span> <span class='comment'># 0 can't be xorshifted
 </span><span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -390,7 +401,9 @@ contending for the global +Kernel.rand+.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>using the &quot;yˆ=y&gt;&gt;a; yˆ=y&lt;<b; yˆ=y>&gt;c;&quot; transform with the (a,b,c) tuple with values (1,1,54) to minimise Bignum overflows</p>
+    
+<p>using the “yˆ=y&gt;&gt;a; yˆ=y&lt;&lt;b; yˆ=y&gt;&gt;c;” transform with the
+(a,b,c) tuple with values (1,1,54) to minimise Bignum overflows</p>
 
 
   </div>
@@ -428,9 +441,9 @@ contending for the global +Kernel.rand+.</p>
 </div>
 
     <div id="footer">
-  Generated on Sun Mar  8 18:12:19 2015 by
+  Generated on Wed Mar 11 11:06:07 2015 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.0).
+  0.8.7.6 (ruby-1.9.3).
 </div>
 
 <script>

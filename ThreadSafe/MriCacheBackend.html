@@ -109,22 +109,25 @@
         <dt id="WRITE_LOCK-constant" class="">WRITE_LOCK =
           <div class="docstring">
   <div class="discussion">
-    <p>We can get away with a single global write lock (instead of a per-instance
+    
+<p>We can get away with a single global write lock (instead of a per-instance
 one) because of the GVL/green threads.</p>
 
-<p>The previous implementation used <code>Thread.critical</code> on 1.8 MRI to implement
-the 4 composed atomic operations (<code>put_if_absent</code>, <code>replace_pair</code>,
-<code>replace_if_exists</code>, <code>delete_pair</code>) this however doesn&#39;t work for
-<code>compute_if_absent</code> because on 1.8 the Mutex class is itself implemented
-via <code>Thread.critical</code> and a call to <code>Mutex#lock</code> does not restore the
-previous <code>Thread.critical</code> value (thus any synchronisation clears the
-<code>Thread.critical</code> flag and we loose control). This poses a problem as the
-provided block might use synchronisation on its own.</p>
+<p>The previous implementation used <code>Thread.critical</code> on 1.8 MRI to
+implement the 4 composed atomic operations (<code>put_if_absent</code>,
+<code>replace_pair</code>, <code>replace_if_exists</code>,
+<code>delete_pair</code>) this however doesn't work for
+<code>compute_if_absent</code> because on 1.8 the Mutex class is itself
+implemented via <code>Thread.critical</code> and a call to
+<code>Mutex#lock</code> does not restore the previous
+<code>Thread.critical</code> value (thus any synchronisation clears the
+<code>Thread.critical</code> flag and we loose control). This poses a
+problem as the provided block might use synchronisation on its own.</p>
 
 <p>NOTE: a neat idea of writing a c-ext to manually perform atomic
 put_if_absent, while relying on Ruby not releasing a GVL while calling a
-c-ext will not work because of the potentially Ruby implemented <code>#hash</code>
-and <code>#eql?</code> key methods.</p>
+c-ext will not work because of the potentially Ruby implemented
+<code>#hash</code> and <code>#eql?</code> key methods.</p>
 
 
   </div>
@@ -755,9 +758,9 @@ and <code>#eql?</code> key methods.</p>
 </div>
 
     <div id="footer">
-  Generated on Sun Mar  8 18:12:19 2015 by
+  Generated on Wed Mar 11 11:06:09 2015 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.0).
+  0.8.7.6 (ruby-1.9.3).
 </div>
 
 <script>

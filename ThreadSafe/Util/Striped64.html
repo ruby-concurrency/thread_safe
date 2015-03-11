@@ -105,67 +105,68 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>A Ruby port of the Doug Lea&#39;s jsr166e.Striped64 class version 1.6
-available in public domain.</p>
+    
+<p>A Ruby port of the Doug Lea's jsr166e.Striped64 class version 1.6 available
+in public domain.</p>
 
-<p>Original source code available here:
-<a href="http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/Striped64.java?revision=1.6">http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/Striped64.java?revision=1.6</a></p>
+<p>Original source code available here: <a
+href="http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/Striped64.java?revision=1.6">gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/Striped64.java?revision=1.6</a></p>
 
 <p>Class holding common representation and mechanics for classes supporting
 dynamic striping on 64bit values.</p>
 
 <p>This class maintains a lazily-initialized table of atomically updated
-variables, plus an extra +base+ field. The table size is a power of two.
-Indexing uses masked per-thread hash codes. Nearly all methods on this
-class are private, accessed directly by subclasses.</p>
+variables, plus an extra <code>base</code> field. The table size is a power
+of two. Indexing uses masked per-thread hash codes. Nearly all methods on
+this class are private, accessed directly by subclasses.</p>
 
-<p>Table entries are of class +Cell+; a variant of AtomicLong padded to
-reduce cache contention on most processors. Padding is overkill for most
-Atomics because they are usually irregularly scattered in memory and thus
-don&#39;t interfere much with each other. But Atomic objects residing in
-arrays will tend to be placed adjacent to each other, and so will most
+<p>Table entries are of class <code>Cell</code>; a variant of AtomicLong
+padded to reduce cache contention on most processors. Padding is overkill
+for most Atomics because they are usually irregularly scattered in memory
+and thus don't interfere much with each other. But Atomic objects residing
+in arrays will tend to be placed adjacent to each other, and so will most
 often share cache lines (with a huge negative performance impact) without
 this precaution.</p>
 
 <p>In part because +Cell+s are relatively large, we avoid creating them until
 they are needed. When there is no contention, all updates are made to the
-+base+ field. Upon first contention (a failed CAS on +base+ update), the
-table is initialized to size 2. The table size is doubled upon further
-contention until reaching the nearest power of two greater than or equal
-to the number of CPUS. Table slots remain empty (+nil+) until they are
-needed.</p>
+<code>base</code> field. Upon first contention (a failed CAS on
+<code>base</code> update), the table is initialized to size 2. The table
+size is doubled upon further contention until reaching the nearest power of
+two greater than or equal to the number of CPUS. Table slots remain empty
+(<code>nil</code>) until they are needed.</p>
 
-<p>A single spinlock (+busy+) is used for initializing and resizing the
-table, as well as populating slots with new +Cell+s. There is no need for
-a blocking lock: When the lock is not available, threads try other slots
-(or the base). During these retries, there is increased contention and
-reduced locality, which is still better than alternatives.</p>
+<p>A single spinlock (<code>busy</code>) is used for initializing and resizing
+the table, as well as populating slots with new +Cell+s. There is no need
+for a blocking lock: When the lock is not available, threads try other
+slots (or the base). During these retries, there is increased contention
+and reduced locality, which is still better than alternatives.</p>
 
 <p>Per-thread hash codes are initialized to random values. Contention and/or
 table collisions are indicated by failed CASes when performing an update
-operation (see method +retry_update+). Upon a collision, if the table size
-is less than the capacity, it is doubled in size unless some other thread
-holds the lock. If a hashed slot is empty, and lock is available, a new
-+Cell+ is created. Otherwise, if the slot exists, a CAS is tried. Retries
-proceed by &quot;double hashing&quot;, using a secondary hash (XorShift) to try to
-find a free slot.</p>
+operation (see method <code>retry_update</code>). Upon a collision, if the
+table size is less than the capacity, it is doubled in size unless some
+other thread holds the lock. If a hashed slot is empty, and lock is
+available, a new <code>Cell</code> is created. Otherwise, if the slot
+exists, a CAS is tried. Retries proceed by "double hashing", using a
+secondary hash (XorShift) to try to find a free slot.</p>
 
 <p>The table size is capped because, when there are more threads than CPUs,
-supposing that each thread were bound to a CPU, there would exist a
-perfect hash function mapping threads to slots that eliminates collisions.
-When we reach capacity, we search for this mapping by randomly varying the
-hash codes of colliding threads. Because search is random, and collisions
-only become known via CAS failures, convergence can be slow, and because
-threads are typically not bound to CPUS forever, may not occur at all.
-However, despite these limitations, observed contention rates are
-typically low in these cases.</p>
+supposing that each thread were bound to a CPU, there would exist a perfect
+hash function mapping threads to slots that eliminates collisions. When we
+reach capacity, we search for this mapping by randomly varying the hash
+codes of colliding threads. Because search is random, and collisions only
+become known via CAS failures, convergence can be slow, and because threads
+are typically not bound to CPUS forever, may not occur at all. However,
+despite these limitations, observed contention rates are typically low in
+these cases.</p>
 
-<p>It is possible for a +Cell+ to become unused when threads that once hashed
-to it terminate, as well as in the case where doubling the table causes no
-thread to hash to it under expanded mask. We do not try to detect or
-remove such cells, under the assumption that for long-running instances,
-observed contention levels will recur, so the cells will eventually be
-needed again; and for short-lived ones, it does not matter.</p>
+<p>It is possible for a <code>Cell</code> to become unused when threads that
+once hashed to it terminate, as well as in the case where doubling the
+table causes no thread to hash to it under expanded mask. We do not try to
+detect or remove such cells, under the assumption that for long-running
+instances, observed contention levels will recur, so the cells will
+eventually be needed again; and for short-lived ones, it does not matter.</p>
 
 
   </div>
@@ -227,7 +228,9 @@ needed again; and for short-lived ones, it does not matter.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Provides +volatile+ (in the JVM&#39;s sense) attribute accessors implemented atop of the +AtomicReference+s.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>Provides <code>volatile</code> (in the JVM's sense) attribute accessors
+implemented atop of the +AtomicReference+s.</p>
 </div></span>
   
 </li>
@@ -261,7 +264,8 @@ needed again; and for short-lived ones, it does not matter.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>A new instance of Striped64.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>A new instance of Striped64.</p>
 </div></span>
   
 </li>
@@ -284,7 +288,9 @@ needed again; and for short-lived ones, it does not matter.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Handles cases of updates involving initialization, resizing, creating new Cells, and/or contention.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>Handles cases of updates involving initialization, resizing, creating new
+Cells, and/or contention.</p>
 </div></span>
   
 </li>
@@ -309,7 +315,8 @@ needed again; and for short-lived ones, it does not matter.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Returns a new instance of Striped64</p>
+    
+<p>Returns a new instance of Striped64</p>
 
 
   </div>
@@ -365,11 +372,12 @@ needed again; and for short-lived ones, it does not matter.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Provides +volatile+ (in the JVM&#39;s sense) attribute accessors implemented atop of the +AtomicReference+s.
-Usage:
-  class Foo
-    extend ThreadSafe::Util::Volatile
-    attr_volatile :foo, :bar</p>
+    
+<p>Provides <code>volatile</code> (in the JVM's sense) attribute accessors
+implemented atop of the +AtomicReference+s.</p>
+
+<p>Usage:  class Foo  extend ThreadSafe::Util::Volatile  attr_volatile :foo,
+:bar</p>
 
 <pre class="code ruby"><code class="ruby"><span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_bar'>bar</span><span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='rparen'>)</span> <span class='comment'># must super() into parent initializers before using the volatile attribute accessors
@@ -411,19 +419,14 @@ Usage:
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Handles cases of updates involving initialization, resizing,
-creating new Cells, and/or contention. See above for
-explanation. This method suffers the usual non-modularity
-problems of optimistic retry code, relying on rechecked sets of
-reads.</p>
+    
+<p>Handles cases of updates involving initialization, resizing, creating new
+Cells, and/or contention. See above for explanation. This method suffers
+the usual non-modularity problems of optimistic retry code, relying on
+rechecked sets of reads.</p>
 
-<p>Arguments:
-[+x+]
-  the value
-[+hash_code+]
-  hash code used
-[+x+]
-  false if CAS failed before call</p>
+<p>Arguments: [<code>x</code>]  the value [<code>hash_code</code>]  hash code
+used [<code>x</code>]  false if CAS failed before call</p>
 
 
   </div>
@@ -521,9 +524,9 @@ reads.</p>
 </div>
 
     <div id="footer">
-  Generated on Sun Mar  8 18:12:19 2015 by
+  Generated on Wed Mar 11 11:06:08 2015 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.0).
+  0.8.7.6 (ruby-1.9.3).
 </div>
 
 <script>

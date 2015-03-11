@@ -109,11 +109,13 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>Key-value entry. Nodes with a hash field of +MOVED+ are special, and do
-not contain user keys or values. Otherwise, keys are never +nil+, and
-+NULL+ +value+ fields indicate that a node is in the process of being
-deleted or created. For purposes of read-only access, a key may be read
-before a value, but can only be used after checking value to be +!= NULL+.</p>
+    
+<p>Key-value entry. Nodes with a hash field of <code>MOVED</code> are special,
+and do not contain user keys or values. Otherwise, keys are never
+<code>nil</code>, and <code>NULL</code> <code>value</code> fields indicate
+that a node is in the process of being deleted or created. For purposes of
+read-only access, a key may be read before a value, but can only be used
+after checking value to be +!= NULL+.</p>
 
 
   </div>
@@ -129,7 +131,8 @@ before a value, but can only be used after checking value to be +!= NULL+.</p>
         <dt id="MOVED-constant" class="">MOVED =
           <div class="docstring">
   <div class="discussion">
-    <p>Encodings for special uses of Node hash fields. See above for explanation.</p>
+    
+<p>Encodings for special uses of Node hash fields. See above for explanation.</p>
 
 
   </div>
@@ -139,12 +142,13 @@ before a value, but can only be used after checking value to be +!= NULL+.</p>
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>10</span><span class='tstring_end'>&#39;</span></span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span> <span class='op'>*</span> <span class='id identifier rubyid_bit_shift'>bit_shift</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>2</span><span class='rparen'>)</span></pre></dd>
+        <dd><pre class="code"><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>10</span><span class='tstring_end'>'</span></span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>0</span><span class='tstring_end'>'</span></span> <span class='op'>*</span> <span class='id identifier rubyid_bit_shift'>bit_shift</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>2</span><span class='rparen'>)</span></pre></dd>
       
         <dt id="LOCKED-constant" class="">LOCKED =
           <div class="docstring">
   <div class="discussion">
-    <p>set/tested only as a bit</p>
+    
+<p>set/tested only as a bit</p>
 
 
   </div>
@@ -154,12 +158,13 @@ before a value, but can only be used after checking value to be +!= NULL+.</p>
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>01</span><span class='tstring_end'>&#39;</span></span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span> <span class='op'>*</span> <span class='id identifier rubyid_bit_shift'>bit_shift</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>2</span><span class='rparen'>)</span></pre></dd>
+        <dd><pre class="code"><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>01</span><span class='tstring_end'>'</span></span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>0</span><span class='tstring_end'>'</span></span> <span class='op'>*</span> <span class='id identifier rubyid_bit_shift'>bit_shift</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>2</span><span class='rparen'>)</span></pre></dd>
       
         <dt id="WAITING-constant" class="">WAITING =
           <div class="docstring">
   <div class="discussion">
-    <p>both bits set/tested together</p>
+    
+<p>both bits set/tested together</p>
 
 
   </div>
@@ -169,12 +174,13 @@ before a value, but can only be used after checking value to be +!= NULL+.</p>
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>11</span><span class='tstring_end'>&#39;</span></span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span> <span class='op'>*</span> <span class='id identifier rubyid_bit_shift'>bit_shift</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>2</span><span class='rparen'>)</span></pre></dd>
+        <dd><pre class="code"><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>11</span><span class='tstring_end'>'</span></span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>0</span><span class='tstring_end'>'</span></span> <span class='op'>*</span> <span class='id identifier rubyid_bit_shift'>bit_shift</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>2</span><span class='rparen'>)</span></pre></dd>
       
         <dt id="HASH_BITS-constant" class="">HASH_BITS =
           <div class="docstring">
   <div class="discussion">
-    <p>usable bits of normal node hash</p>
+    
+<p>usable bits of normal node hash</p>
 
 
   </div>
@@ -184,7 +190,7 @@ before a value, but can only be used after checking value to be +!= NULL+.</p>
 
 </div>
         </dt>
-        <dd><pre class="code"><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>00</span><span class='tstring_end'>&#39;</span></span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span> <span class='op'>*</span> <span class='id identifier rubyid_bit_shift'>bit_shift</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>2</span><span class='rparen'>)</span></pre></dd>
+        <dd><pre class="code"><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>00</span><span class='tstring_end'>'</span></span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>1</span><span class='tstring_end'>'</span></span> <span class='op'>*</span> <span class='id identifier rubyid_bit_shift'>bit_shift</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>2</span><span class='rparen'>)</span></pre></dd>
       
         <dt id="SPIN_LOCK_ATTEMPTS-constant" class="">SPIN_LOCK_ATTEMPTS =
           
@@ -222,7 +228,8 @@ before a value, but can only be used after checking value to be +!= NULL+.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute key.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute key.</p>
 </div></span>
   
 </li>
@@ -263,7 +270,9 @@ before a value, but can only be used after checking value to be +!= NULL+.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Provides +volatile+ (in the JVM&#39;s sense) attribute accessors implemented atop of the +AtomicReference+s.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>Provides <code>volatile</code> (in the JVM's sense) attribute accessors
+implemented atop of the +AtomicReference+s.</p>
 </div></span>
   
 </li>
@@ -319,7 +328,8 @@ before a value, but can only be used after checking value to be +!= NULL+.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>A new instance of Node.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>A new instance of Node.</p>
 </div></span>
   
 </li>
@@ -430,7 +440,10 @@ before a value, but can only be used after checking value to be +!= NULL+.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Spins a while if +LOCKED+ bit set and this node is the first of its bin, and then sets +WAITING+ bits on hash field and blocks (once) if they are still set.</p>
+    <span class="summary_desc"><div class='inline'>
+<p>Spins a while if <code>LOCKED</code> bit set and this node is the first of
+its bin, and then sets <code>WAITING</code> bits on hash field and blocks
+(once) if they are still set.</p>
 </div></span>
   
 </li>
@@ -501,7 +514,8 @@ before a value, but can only be used after checking value to be +!= NULL+.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Returns a new instance of Node</p>
+    
+<p>Returns a new instance of Node</p>
 
 
   </div>
@@ -556,7 +570,8 @@ before a value, but can only be used after checking value to be +!= NULL+.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Returns the value of attribute key</p>
+    
+<p>Returns the value of attribute key</p>
 
 
   </div>
@@ -608,11 +623,12 @@ before a value, but can only be used after checking value to be +!= NULL+.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Provides +volatile+ (in the JVM&#39;s sense) attribute accessors implemented atop of the +AtomicReference+s.
-Usage:
-  class Foo
-    extend ThreadSafe::Util::Volatile
-    attr_volatile :foo, :bar</p>
+    
+<p>Provides <code>volatile</code> (in the JVM's sense) attribute accessors
+implemented atop of the +AtomicReference+s.</p>
+
+<p>Usage:  class Foo  extend ThreadSafe::Util::Volatile  attr_volatile :foo,
+:bar</p>
 
 <pre class="code ruby"><code class="ruby"><span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_bar'>bar</span><span class='rparen'>)</span>
   <span class='kw'>super</span><span class='lparen'>(</span><span class='rparen'>)</span> <span class='comment'># must super() into parent initializers before using the volatile attribute accessors
@@ -892,15 +908,18 @@ Usage:
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Spins a while if +LOCKED+ bit set and this node is the first of its bin,
-and then sets +WAITING+ bits on hash field and blocks (once) if they are
-still set. It is OK for this method to return even if lock is not
-available upon exit, which enables these simple single-wait mechanics.</p>
+    
+<p>Spins a while if <code>LOCKED</code> bit set and this node is the first of
+its bin, and then sets <code>WAITING</code> bits on hash field and blocks
+(once) if they are still set. It is OK for this method to return even if
+lock is not available upon exit, which enables these simple single-wait
+mechanics.</p>
 
 <p>The corresponding signalling operation is performed within callers: Upon
-detecting that +WAITING+ has been set when unlocking lock (via a failed
-CAS from non-waiting +LOCKED+ state), unlockers acquire the
-+cheap_synchronize+ lock and perform a +cheap_broadcast+.</p>
+detecting that <code>WAITING</code> has been set when unlocking lock (via a
+failed CAS from non-waiting <code>LOCKED</code> state), unlockers acquire
+the <code>cheap_synchronize</code> lock and perform a
+<code>cheap_broadcast</code>.</p>
 
 
   </div>
@@ -1046,9 +1065,9 @@ CAS from non-waiting +LOCKED+ state), unlockers acquire the
 </div>
 
     <div id="footer">
-  Generated on Sun Mar  8 18:12:19 2015 by
+  Generated on Wed Mar 11 11:06:10 2015 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.0).
+  0.8.7.6 (ruby-1.9.3).
 </div>
 
 <script>

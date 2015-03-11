@@ -92,15 +92,35 @@
     
   
     
+      <dt class="r2">Includes:</dt>
+      <dd class="r2">JRuby::Synchronized</dd>
+      
+    
   
   
   
-    <dt class="r2 last">Defined in:</dt>
-    <dd class="r2 last">lib/thread_safe.rb</dd>
+    <dt class="r1 last">Defined in:</dt>
+    <dd class="r1 last">lib/thread_safe.rb</dd>
   
 </dl>
 <div class="clear"></div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>A thread-safe subclass of Array. This version locks against the object
+itself for every method call, ensuring only one thread can be reading or
+writing at a time. This includes iteration methods like</p>
+
+<h1 id="label-each.">each.</h1>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
 
 
 
@@ -108,15 +128,15 @@
 
 
 
-
+  
   
 
 </div>
 
     <div id="footer">
-  Generated on Sun Mar  8 18:12:19 2015 by
+  Generated on Wed Mar 11 11:06:08 2015 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.8.7.6 (ruby-2.2.0).
+  0.8.7.6 (ruby-1.9.3).
 </div>
 
 <script>
