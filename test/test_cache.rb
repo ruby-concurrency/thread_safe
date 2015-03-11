@@ -11,7 +11,7 @@ class TestCache < Minitest::Test
 
   def test_concurrency
     cache = @cache
-    (1..100).map do |i|
+    (1..THREADS).map do |i|
       Thread.new do
         1000.times do |j|
           key = i*1000+j

@@ -1,6 +1,6 @@
 # Threadsafe
 
-[![Build Status](https://travis-ci.org/headius/thread_safe.png)](https://travis-ci.org/headius/thread_safe)
+[![Gem Version](https://badge.fury.io/rb/thread_safe.svg)](http://badge.fury.io/rb/thread_safe) [![Build Status](https://travis-ci.org/ruby-concurrency/thread_safe.svg?branch=master)](https://travis-ci.org/ruby-concurrency/thread_safe) [![Coverage Status](https://img.shields.io/coveralls/ruby-concurrency/thread_safe/master.svg)](https://coveralls.io/r/ruby-concurrency/thread_safe) [![Code Climate](https://codeclimate.com/github/ruby-concurrency/thread_safe.svg)](https://codeclimate.com/github/ruby-concurrency/thread_safe) [![Dependency Status](https://gemnasium.com/ruby-concurrency/thread_safe.svg)](https://gemnasium.com/ruby-concurrency/thread_safe) [![License](https://img.shields.io/badge/license-apache-green.svg)](http://opensource.org/licenses/MIT) [![Gitter chat](http://img.shields.io/badge/gitter-join%20chat%20%E2%86%92-brightgreen.svg)](https://gitter.im/ruby-concurrency/concurrent-ruby)
 
 A collection of thread-safe versions of common core Ruby classes.
 
