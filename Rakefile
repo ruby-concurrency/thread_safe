@@ -49,7 +49,7 @@ if defined?(JRUBY_VERSION)
     ant.jar :basedir => 'pkg/tests', :destfile => 'test/package.jar', :includes => '**/*.class'
   end
 
-  task :package => [ :jar, 'test-jar' ]
+  task :package => [ :clean, :compile, :jar, 'test-jar' ]
 else
   # No need to package anything for non-jruby rubies
   task :package
