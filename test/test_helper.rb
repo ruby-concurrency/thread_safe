@@ -1,23 +1,27 @@
 unless defined?(JRUBY_VERSION)
-  require 'simplecov'
-  require 'coveralls'
+  begin
+    require 'simplecov'
+    require 'coveralls'
 
-  SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
-    SimpleCov::Formatter::HTMLFormatter,
-    Coveralls::SimpleCov::Formatter
-  ]
+    SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+      SimpleCov::Formatter::HTMLFormatter,
+      Coveralls::SimpleCov::Formatter
+    ]
 
-  SimpleCov.start do
-    project_name 'thread_safe'
+    SimpleCov.start do
+      project_name 'thread_safe'
 
-    add_filter '/examples/'
-    add_filter '/pkg/'
-    add_filter '/test/'
-    add_filter '/tasks/'
-    add_filter '/yard-template/'
-    add_filter '/yardoc/'
+      add_filter '/examples/'
+      add_filter '/pkg/'
+      add_filter '/test/'
+      add_filter '/tasks/'
+      add_filter '/yard-template/'
+      add_filter '/yardoc/'
 
-    command_name 'Mintest'
+      command_name 'Mintest'
+    end
+  rescue LoadError
+    warn "warning: simplecov/coveralls gems not found; skipping coverage"
   end
 end
 
