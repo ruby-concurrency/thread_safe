@@ -27,8 +27,12 @@ end
 
 require 'minitest/autorun'
 
-require 'minitest/reporters'
-Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new(color: true)
+begin
+  require 'minitest/reporters'
+  Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new(color: true)
+rescue LoadError
+  warn "warning: minitest-reporters gem not found; skipping reporters output"
+end
 
 require 'thread'
 require 'thread_safe'
