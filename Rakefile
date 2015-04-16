@@ -1,5 +1,6 @@
-require "bundler/gem_tasks"
-require "rake/testtask"
+require 'bundler/gem_tasks'
+require 'rspec'
+require 'rspec/core/rake_task'
 
 ## safely load all the rake tasks in the `tasks` directory
 def safe_load(file)
@@ -10,6 +11,7 @@ def safe_load(file)
     puts ex.message
   end
 end
+
 Dir.glob('tasks/**/*.rake').each do |rakefile|
   safe_load rakefile
 end
@@ -17,9 +19,9 @@ end
 task :default => :test
 
 if defined?(JRUBY_VERSION)
-  require "ant"
+  require 'ant'
 
-  directory "pkg/classes"
+  directory 'pkg/classes'
   directory 'pkg/tests'
 
   desc "Clean up build artifacts"
@@ -43,10 +45,10 @@ if defined?(JRUBY_VERSION)
 
   desc "Build test jar"
   task 'test-jar' => 'pkg/tests' do |t|
-    ant.javac :srcdir => 'test/src', :destdir => t.prerequisites.first,
+    ant.javac :srcdir => 'spec/src', :destdir => t.prerequisites.first,
       :source => "1.5", :target => "1.5", :debug => true
 
-    ant.jar :basedir => 'pkg/tests', :destfile => 'test/package.jar', :includes => '**/*.class'
+    ant.jar :basedir => 'pkg/tests', :destfile => 'spec/package.jar', :includes => '**/*.class'
   end
 
   task :package => [ :clean, :compile, :jar, 'test-jar' ]
@@ -55,7 +57,6 @@ else
   task :package
 end
 
-Rake::TestTask.new :test => :package do |t|
-  t.libs << "lib"
-  t.test_files = FileList["test/**/*.rb"]
+RSpec::Core::RakeTask.new :test => :package do |t|
+  t.rspec_opts = '--color --backtrace --tag ~unfinished --seed 1 --format documentation ./spec'
 end
