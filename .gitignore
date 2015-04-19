@@ -1,5 +1,5 @@
 Gemfile.lock
-test/*.jar
+spec/*.jar
 .rspec-local
 *.gem
 lib/1.8

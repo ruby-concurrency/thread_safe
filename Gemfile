@@ -3,8 +3,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development, :test do
-  gem 'minitest', '~> 5.5.1'
-  gem 'minitest-reporters', '~> 1.0.11'
+  gem 'rspec', '~> 3.2.0'
   gem 'simplecov', '~> 0.9.2', :require => false
   gem 'coveralls', '~> 0.7.11', :require => false
 end
