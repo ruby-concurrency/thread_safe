@@ -13,7 +13,7 @@ if defined?(JRUBY_VERSION) && ENV['TEST_NO_UNSAFE']
       it 'security_manager_is_used' do
         begin
           java_import 'sun.misc.Unsafe'
-          flunk
+          fail
         rescue SecurityError
         end
       end
