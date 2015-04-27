@@ -9,7 +9,6 @@ module ThreadSafe
           require 'atomic'
           defined?(Atomic::InternalReference) ? Atomic::InternalReference : Atomic
         rescue LoadError, NameError
-          require 'thread' # get Mutex on 1.8
           class FullLockingAtomicReference
             def initialize(value = nil)
               @___mutex = Mutex.new

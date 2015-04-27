@@ -21,8 +21,6 @@ module ThreadSafe
   end
 
   class Cache < ConcurrentCacheBackend
-    KEY_ERROR = defined?(KeyError) ? KeyError : IndexError # there is no KeyError in 1.8 mode
-
     def initialize(options = nil, &block)
       if options.kind_of?(::Hash)
         validate_options_hash!(options)
@@ -138,7 +136,7 @@ module ThreadSafe
 
     private
     def raise_fetch_no_key
-      raise KEY_ERROR, 'key not found'
+      raise KeyError, 'key not found'
     end
 
     def initialize_copy(other)

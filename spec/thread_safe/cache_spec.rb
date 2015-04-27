@@ -397,7 +397,6 @@ module ThreadSafe
         @cache[:a] = 1
         expect(:a).to  eq  @cache.key(1)
         expect(nil).to eq  @cache.key(0)
-        expect(:a).to  eq  @cache.index(1) if RUBY_VERSION =~ /1\.8/
       end
     end
 
@@ -492,7 +491,7 @@ module ThreadSafe
             expect(1).to eq @cache.fetch(:a) { flunk }
           end
 
-          expect { @cache.fetch(:b) }.to raise_error(ThreadSafe::Cache::KEY_ERROR)
+          expect { @cache.fetch(:b) }.to raise_error(KeyError)
 
           expect_no_size_change do
             expect(1).to     eq @cache.fetch(:b, :c) {1} # assert block supersedes default value argument
@@ -555,7 +554,7 @@ module ThreadSafe
           end
 
           expect { @cache.fetch_or_store(:b) }.
-            to raise_error(ThreadSafe::Cache::KEY_ERROR)
+            to raise_error(KeyError)
 
           expect_size_change(1) do
             expect(1).to eq @cache.fetch_or_store(:b, :c) { 1 } # assert block supersedes default value argument

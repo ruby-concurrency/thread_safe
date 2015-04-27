@@ -40,21 +40,4 @@ class SynchronizedDelegator < SimpleDelegator
     end
   end
 
-  # Work-around for 1.8 std-lib not passing block around to delegate.
-  # @private
-  def method_missing(method, *args, &block)
-    monitor = @monitor
-    begin
-      monitor.enter
-      target = self.__getobj__
-      if target.respond_to?(method)
-        target.__send__(method, *args, &block)
-      else
-        super(method, *args, &block)
-      end
-    ensure
-      monitor.exit
-    end
-  end if RUBY_VERSION[0, 3] == '1.8'
-
 end unless defined?(SynchronizedDelegator)

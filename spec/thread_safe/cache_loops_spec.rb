@@ -503,5 +503,5 @@ module ThreadSafe
       expect(sum(cache.values)).to   eq sum(result)
       expect(options[:key_count]).to eq cache.size
     end
-  end unless RUBY_VERSION =~ /1\.8/ || RUBY_ENGINE == 'rbx' || ENV['TRAVIS']
+  end unless RUBY_ENGINE == 'rbx' || ENV['TRAVIS']
 end
