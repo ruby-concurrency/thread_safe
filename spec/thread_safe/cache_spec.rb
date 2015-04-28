@@ -679,6 +679,16 @@ module ThreadSafe
       expect([1, 2]).to eq @cache.keys.sort
     end
 
+    it '#values' do
+      expect([]).to eq @cache.values
+
+      @cache[1] = 1
+      expect([1]).to eq @cache.values
+
+      @cache[2] = 2
+      expect([1, 2]).to eq @cache.values.sort
+    end
+
     it '#each_key' do
       expect(@cache).to eq @cache.each_key { flunk }
 
