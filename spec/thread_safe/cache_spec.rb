@@ -92,7 +92,7 @@ module ThreadSafe
           late_compute_threads = Array.new(late_compute_threads_count) do
             Thread.new do
               block_until_compute_started.call('compute_if_absent')
-              expect(1).to eq @cache.compute_if_absent(:a) { flunk }
+              expect(1).to eq @cache.compute_if_absent(:a) { fail }
             end
           end
 
@@ -132,7 +132,7 @@ module ThreadSafe
           expect_no_size_change do
             expect(nil).to   eq @cache.compute_if_present(:a) {}
             expect(nil).to   eq @cache.compute_if_present(:a) { 1 }
-            expect(nil).to   eq @cache.compute_if_present(:a) { flunk }
+            expect(nil).to   eq @cache.compute_if_present(:a) { fail }
             expect(false).to eq @cache.key?(:a)
           end
 
@@ -220,7 +220,7 @@ module ThreadSafe
       it 'common' do
         with_or_without_default_proc do
           expect_size_change(1) do
-            expect(nil).to  eq @cache.merge_pair(:a, nil) { flunk }
+            expect(nil).to  eq @cache.merge_pair(:a, nil) { fail }
             expect(true).to eq @cache.key?(:a)
             expect(nil).to  eq @cache[:a]
           end
@@ -489,7 +489,7 @@ module ThreadSafe
 
           @cache[:a] = 1
           expect_no_size_change do
-            expect(1).to eq @cache.fetch(:a) { flunk }
+            expect(1).to eq @cache.fetch(:a) { fail }
           end
 
           expect { @cache.fetch(:b) }.to raise_error(ThreadSafe::Cache::KEY_ERROR)
@@ -515,7 +515,7 @@ module ThreadSafe
           @cache[:a] = nil
           expect_no_size_change do
             expect(true).to eq @cache.key?(:a)
-            expect(nil).to  eq @cache.fetch(:a) { flunk }
+            expect(nil).to  eq @cache.fetch(:a) { fail }
           end
         end
       end
@@ -551,7 +551,7 @@ module ThreadSafe
           end
 
           expect_no_size_change do
-            expect(1).to eq @cache.fetch_or_store(:a) { flunk }
+            expect(1).to eq @cache.fetch_or_store(:a) { fail }
           end
 
           expect { @cache.fetch_or_store(:b) }.
@@ -597,7 +597,7 @@ module ThreadSafe
 
           @cache[:a] = nil
           expect_no_size_change do
-            expect(nil).to eq @cache.fetch_or_store(:a) { flunk }
+            expect(nil).to eq @cache.fetch_or_store(:a) { fail }
           end
         end
       end
@@ -625,7 +625,7 @@ module ThreadSafe
 
     describe '#each_pair' do
       it 'common' do
-        @cache.each_pair { |k, v| flunk }
+        @cache.each_pair { |k, v| fail }
         expect(@cache).to eq @cache.each_pair {}
         @cache[:a] = 1
 
@@ -647,7 +647,7 @@ module ThreadSafe
           if i == 0
             i += 1
             next
-            flunk
+            fail
           elsif i == 1
             break :breaked
           end
@@ -690,7 +690,7 @@ module ThreadSafe
     end
 
     it '#each_key' do
-      expect(@cache).to eq @cache.each_key { flunk }
+      expect(@cache).to eq @cache.each_key { fail }
 
       @cache[1] = 1
       arr = []
@@ -704,7 +704,7 @@ module ThreadSafe
     end
 
     it '#each_value' do
-      expect(@cache).to eq @cache.each_value { flunk }
+      expect(@cache).to eq @cache.each_value { fail }
 
       @cache[1] = 1
       arr = []
