@@ -150,8 +150,8 @@ module ThreadSafe
     end
 
     def validate_options_hash!(options)
-      if (initial_capacity = options[:initial_capacity]) && (!initial_capacity.kind_of?(Fixnum) || initial_capacity < 0)
-        raise ArgumentError, ":initial_capacity must be a positive Fixnum"
+      if (initial_capacity = options[:initial_capacity]) && (!initial_capacity.kind_of?(0.class) || initial_capacity < 0)
+        raise ArgumentError, ":initial_capacity must be a positive #{0.class}"
       end
       if (load_factor = options[:load_factor]) && (!load_factor.kind_of?(Numeric) || load_factor <= 0 || load_factor > 1)
         raise ArgumentError, ":load_factor must be a number between 0 and 1"

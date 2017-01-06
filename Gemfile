@@ -5,6 +5,10 @@ gemspec
 group :development, :test do
   gem 'rspec', '~> 3.2.0'
   gem 'simplecov', '~> 0.9.2', :require => false
+  if RUBY_VERSION < "2.0.0"
+    gem 'term-ansicolor', '~> 1.3.2', :require => false
+    gem 'tins', '~> 1.6.0', :require => false
+  end
   gem 'coveralls', '~> 0.7.11', :require => false
 end
 
