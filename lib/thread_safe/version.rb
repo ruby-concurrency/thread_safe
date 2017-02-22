@@ -1,5 +1,5 @@
 module ThreadSafe
-  VERSION = "0.3.5"
+  VERSION = "0.3.6"
 end
 
 # NOTE: <= 0.2.0 used Threadsafe::VERSION
